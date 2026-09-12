@@ -40,7 +40,7 @@ function responseFor(result, floor) {
 function responsePlan(plan, result, floor) {
   if (!result) return plan;
   const character = floor.character || defaultCharacter;
-  const scene = `${floor.setting}. Portrait 9:16. Preserve the loose black ink lines, translucent watercolour washes, white paper and playful storybook illustration of <Picture 1>. Match ${character.name}, ${character.description || character.role}, in <Picture 2>. Chest-up view from the encounter angle. Keep the busy background and consistent character identity.`;
+  const scene = `${floor.setting}. Portrait 9:16. Preserve the loose black ink lines, translucent watercolour washes, white paper and playful storybook illustration of <Picture 1>. Match ${character.name}, ${character.description || character.role}, in <Picture 2>. Chest-up view from the encounter angle. Keep the busy background and consistent character identity. Redraw the offered object entirely in this same illustration style: scratchy, lively dip-pen contours, uneven hand-drawn proportions, loose transparent watercolour and visible paper. Preserve its recognisable shape, colour and defining details from the evidence, but interpret its material through ink and paint. The object and the character must look drawn by the same hand in the same scene. Never paste in a photograph, photographic cutout, realistic texture or glossy 3D object; the submitted photo provides object information only, never the rendering style.`;
   const action = result.flag
     ? `${character.name} gives a calm, friendly nod and an open-handed invitation to find something else. Do not depict or refer to the submitted content. No object appears, no predicament resolves, and no reward appears.`
     : floor.id === 'butterscotch-buttergin'

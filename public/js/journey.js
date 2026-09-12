@@ -183,8 +183,11 @@ async function drive(id = generation, first = false) {
       $("storyStatus").hidden = true; status(beat === "ask" ? `${guide()} needs your help` : "exploring");
       if(enteringFloor)setLine(beatLines[beat]);
       if (beat === "ask") setLine(floor().ask);
-      if (plan.dialogue) setLine(plan.dialogue);
-      await world.play(speak); if (!sameVisit(id)) return;
+      if (beat === "reunion") { setLine(""); $("ticket").hidden = true; }
+      else if (plan.dialogue) setLine(plan.dialogue);
+      try { await world.play(speak); }
+      finally { if (sameVisit(id)) $("ticket").hidden = false; }
+      if (!sameVisit(id)) return;
       if(beat==="reunion"&&!journey.result?.flag)VerdictMoments.save(journey.id,journey.result?.id,world.responseFrames||[]);
       saveJourney(await api(`/api/journey/${journey.id}/complete`, { playbackId: plan.playbackId }));
     }
@@ -395,6 +398,7 @@ async function stopChat(){clearTimeout(chatTimer);const c=conversation;conversat
 $("unmuteVideo").onclick=async()=>{try{await world?.audio?.play();$("unmuteVideo").hidden=true;}catch{setLine("Tap again to enable the scene's sound.");}};
 
 async function backToLift() {
+  $("ticket").hidden = false;
   if(!journey)return;
   const old=journey; generation++;controller?.abort();controller=null;journey=null;storage.set(null);VerdictMoments.clear();try{sessionStorage.removeItem("uo_evidence");}catch{}mode="busy";
   for(const el of $("resultSlides").querySelectorAll(".video-memory"))el.remove();

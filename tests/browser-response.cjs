@@ -22,6 +22,16 @@ const { setup, openLift, visitChocolate, reachCamera, shortAudio, floors } = req
     },
   });
   const { page } = h;
+  await page.addInitScript(() => {
+    window.__responsePresentation = [];
+    const play = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function (...args) {
+      if (this.tagName === 'AUDIO' && this.src.startsWith('blob:') && typeof journey !== 'undefined' && journey?.state === 'reunion') {
+        window.__responsePresentation.push({ hidden: document.querySelector('#ticket').hidden, text: document.querySelector('#line').textContent });
+      }
+      return play.apply(this, args);
+    };
+  });
   page.on('response', response => { if (response.url().endsWith('/api/grade') && response.ok()) response.json().then(r => grades.push(r)).catch(() => {}); });
   try {
     await openLift(page, h.base);
@@ -43,6 +53,8 @@ const { setup, openLift, visitChocolate, reachCamera, shortAudio, floors } = req
       const responseClip = h.clips.filter(p => p.beat === 'reunion').at(-1);
       assert.ok(responseClip.prompt.includes(grade === 'F' ? 'red toy brick' : 'blue pouring jug'));
       assert.ok(responseClip.prompt.includes('Mossop'));
+      assert.ok(responseClip.prompt.includes('Redraw the offered object entirely in this same illustration style'));
+      assert.deepEqual(await page.evaluate(() => window.__responsePresentation.at(-1)), { hidden: true, text: '' });
       assert.equal(responseClip.externalVoice, true);
       assert.equal(responseClip.dialogue, grades.at(-1).response);
       if (grade === 'F') {
