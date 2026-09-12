@@ -85,3 +85,35 @@ dialog::backdrop { background:rgba(24,20,17,.28); }
 #gradeStamp{position:absolute;top:80px;right:18px;z-index:24;width:108px;min-height:108px;border:3px double #43593a;border-radius:50%;background:#f6f0dbeF;color:#31452b;text-align:center;transform:rotate(9deg);padding:12px 6px;box-shadow:0 3px 18px #0003;animation:stamp-in .35s ease-out}#gradeValue{display:block;font:48px/1 var(--hand)}#gradeLabel{display:block;font:14px/1.1 var(--hand);margin-top:5px}#voiceNotice{position:absolute;top:45px;left:14px;right:14px;z-index:25;background:#19170ddd;color:#fff7df;border-radius:10px;padding:7px 10px;font-size:12px;text-align:center}@keyframes stamp-in{from{opacity:0;transform:scale(1.5) rotate(15deg)}to{opacity:1;transform:scale(1) rotate(9deg)}}
 
 #gradeStamp{left:18px;right:auto;top:78px;width:92px;height:92px;min-height:0;box-sizing:border-box;padding:7px;pointer-events:none}#gradeValue{font-size:36px}#gradeLabel{font-size:11px}
+
+/* The lift directory follows the five authored walls. */
+#roomSearch{width:100%;border:1px solid #b9ad98;border-radius:9px;padding:10px;background:#fffdf7;font:18px var(--hand)}
+#wallTabs{display:flex;gap:6px;overflow:auto;padding:12px 0;position:sticky;top:-16px;background:var(--paper);z-index:2}
+#wallTabs .chip{font-size:14px;white-space:nowrap;padding:5px 9px;box-shadow:none}
+#wallTabs [aria-pressed=true]{background:#dfe9c9;border-color:#546646}
+.floor-option small{display:block;padding:0 9px 10px;font:11px/1.3 system-ui;color:#655c53}
+.floor-option img{aspect-ratio:3/4;object-position:center}
+#floorName{color:#342c27;text-shadow:none;background:#fffaf0ed;border-radius:7px;width:fit-content;max-width:calc(100% - 28px);padding:4px 9px;font-size:20px}
+/* The spoken verdict lands as a stamped photograph, after the character scene. */
+#reward{top:108px;bottom:105px;max-height:none;border-radius:3px 16px 5px 12px;padding:17px;background:#fffaf0;}
+#reward #resultCharacter{margin:13px 0 5px;color:#766353}
+#reward h2{font:600 25px/1.05 "Fraunces",Georgia,serif;letter-spacing:-.02em;text-transform:uppercase}
+#rewardText{white-space:pre-line;font-size:19px;line-height:1.35}
+#resultEvidence{position:relative;min-height:90px;margin-top:12px;background:#e7e3d6;border:1px solid #cdc5b6;border-radius:3px;transform:rotate(-1deg)}
+#resultPhoto{display:block;width:100%;max-height:200px;object-fit:contain;background:#e7e3d6}
+#resultAnswer{padding:20px 90px 20px 14px;font:italic 22px/1.2 var(--hand);min-height:90px;white-space:pre-wrap;overflow-wrap:anywhere}
+#resultStamp{position:absolute;right:12px;bottom:12px;display:grid;place-items:center;width:78px;height:78px;border:4px double #3b6149;background:#f8f4e9eb;color:#315c40;font:44px/1 var(--hand);border-radius:50%;transform:rotate(10deg);opacity:0}
+#reward.stamped #resultStamp{animation:verdictStamp .4s ease-out forwards}
+@keyframes verdictStamp{0%{transform:rotate(18deg) scale(1.8);opacity:0}75%{transform:rotate(10deg) scale(.94);opacity:1}100%{transform:rotate(10deg) scale(1);opacity:1}}
+#answerForm{background:#fffaf0;color:#352d26;padding:13px;border-radius:12px;margin-bottom:15px}
+#answerForm label{display:block;font:19px var(--hand);margin-bottom:8px}
+#spokenAnswer{width:100%;resize:vertical;max-height:130px;font:19px var(--hand);border:1px solid #b9ad98;border-radius:6px;padding:8px;box-sizing:border-box;margin-bottom:8px}
+#quest.typing #openCam,#quest.typing #takePhoto,#quest.typing #cancelCamera,#quest.typing .cameraFrame{display:none}
+#quest.typing .cameraTop{background:#25201df5;bottom:0}
+#quest.typing #typeAnswer{display:none}
+@media(max-height:690px){#reward{top:100px;bottom:95px;padding:13px}#resultPhoto{max-height:150px}#rewardText{font-size:17px}}
+@media(prefers-reduced-motion:reduce){#reward.stamped #resultStamp{animation:none;opacity:1}}
+
+#resultPhoto{max-height:160px}#rewardText{font-size:18px;line-height:1.3}#reward h2{font-size:23px}
+
+.roomPending{aspect-ratio:3/4;display:grid;place-items:center;padding:18px;text-align:center;font:italic 18px Georgia,serif;color:#8c8170;background:#eee9dd;box-sizing:border-box}.floor-option:disabled{opacity:.8;cursor:default}

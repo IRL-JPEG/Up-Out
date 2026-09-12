@@ -5,11 +5,11 @@ const { floors, clipPlan, actions } = require("../public/js/floors");
 function fail(message, status = 409) { return Object.assign(new Error(message), { status }); }
 class Journeys {
   constructor() { this.items = new Map(); }
-  create(owner, floorId, preview) {
+  create(owner, floorId, preview, rehearsal = preview) {
     if (!floors[floorId]) throw fail("Choose a floor on the panel.", 400);
     for (const [id, j] of this.items) if (j.owner === owner || j.expires < Date.now()) this.items.delete(id);
     if (this.items.size >= 2000) throw fail("The lift is busy. Please try again shortly.", 503);
-    const j = { id: randomUUID(), owner, floorId, preview, state: "tour", expires: Date.now() + 4 * 3600000, validated: false };
+    const j = { id: randomUUID(), owner, floorId: floors[floorId].id, preview, rehearsal, state: "tour", expires: Date.now() + 4 * 3600000, validated: false };
     this.items.set(j.id, j); return j;
   }
   get(id, owner) {
@@ -18,7 +18,7 @@ class Journeys {
     return j;
   }
   instruction(j, action) {
-    if (j.state !== "choice") throw fail("Pip's encounter starts after your first instruction.");
+    if (j.state !== "choice") throw fail("The character's encounter starts after your first instruction.");
     if (!actions.includes(action)) throw fail("Unknown movement.", 400);
     j.action = action; j.state = "instruction";
   }
@@ -35,16 +35,16 @@ class Journeys {
     j.lastPlayback = playbackId; j.pending = null;
   }
   acceptGrade(j, result) {
-    if (j.state !== "quest") throw fail("Take the photo when Pip asks for it.");
-    const pass = ["A*", "A"].includes(result.grade) && result.provenance === "real_world";
-    j.validated = pass && !result.mock && !j.preview;
-    const passed = j.validated || (pass && result.mock && j.preview);
-    j.result = { ...responseFor(result, floors[j.floorId]), passed, validated: j.validated, id: randomUUID() };
-    j.audio = null; j.state = "reunion";
+    if (j.state !== "quest") throw fail("Show your offering when the character asks for it.");
+    const response = responseFor(result, floors[j.floorId]);
+    j.validated = response.passed && !result.mock && !j.rehearsal;
+    const passed = j.validated || (response.passed && result.mock && j.rehearsal);
+    j.result = { ...response, passed, validated: j.validated, photoVerified: j.validated && response.evidenceType === "photo", id: randomUUID() };
+    j.audio = null; j.pending = null; j.state = "reunion";
     return j.result;
   }
   requireReward(j) {
-    if (j.state !== "reward" || !j.validated || j.preview) throw fail("A validated photo and Pip's return unlock this reward.", 403);
+    if (j.state !== "reward" || !j.validated || j.rehearsal) throw fail("A checked offering and the character's reply unlock this keepsake.", 403);
   }
 }
 module.exports = { Journeys, fail };

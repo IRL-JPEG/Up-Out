@@ -1,6 +1,6 @@
 {
   "name": "up-and-out-web",
-  "description": "Up and Out: lift panel, world-model floors on Reactor, Storeroom 54 fetch quest",
+  "description": "A portrait glass-elevator adventure with 45 illustrated rooms, photo favours and rhyming character verdicts",
   "env": {
     "REACTOR_API_KEY": {
       "description": "rk_ key from reactor.inc dashboard. Never shipped to the browser.",
@@ -25,7 +25,7 @@
       "required": false
     },
     "ELEVENLABS_VOICE_ID": {
-      "description": "Pip voice for requests, personalised replies and keepsakes",
+      "description": "Default factory-worker voice for requests, rhyming replies and keepsakes",
       "required": false
     },
     "ELEVENLABS_AGENT_ID": {

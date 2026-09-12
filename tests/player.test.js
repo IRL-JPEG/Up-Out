@@ -24,13 +24,15 @@ test("command errors and disconnects clear every pending wait",async()=>{
 });
 
 test('character playback starts external speech on clip start and waits for its end',async()=>{
- const w=new ReactorWorld('sync');w.readyClip='clip';let started=false,held=false,done=false,resolveSpeech;
+ const w=new ReactorWorld('sync');w.readyClip='clip';let held=false,done=false,resolveSpeech,signalStarted;
  global.$=()=>({replaceChildren(){},hidden:true});w.video={play:async()=>{}};w.holdFrame=()=>{held=true;};
  w.command=async()=>{setImmediate(()=>w.onMessage({type:'clip_started',clip:{clip_id:'clip'}}));};
- const speech=new Promise(r=>{resolveSpeech=r;});
- const playing=w.play(()=>{started=true;return speech;}).then(()=>{done=true;});
- await new Promise(r=>setTimeout(r,10));assert.equal(started,true);assert.equal(done,false);
- w.onMessage({type:'clip_finished',clip:{clip_id:'clip'}});
- await new Promise(r=>setImmediate(r));assert.equal(held,true);assert.equal(done,false);
- resolveSpeech();await playing;assert.equal(done,true);clearTimeout(w.idleTimer);delete global.$;
+ const speech=new Promise(r=>{resolveSpeech=r;}),speechStarted=new Promise(r=>{signalStarted=r;});
+ const playing=w.play(()=>{signalStarted();return speech;}).then(()=>{done=true;});
+ try {
+  await require('../public/js/player').deadline(speechStarted,2000,'Speech did not start');assert.equal(done,false);
+  w.onMessage({type:'clip_finished',clip:{clip_id:'clip'}});
+  await new Promise(r=>setImmediate(r));assert.equal(held,true);assert.equal(done,false);
+  resolveSpeech();await playing;assert.equal(done,true);
+ }finally{resolveSpeech();w.rejectAll(new Error('Test cleanup'));await playing.catch(()=>{});clearTimeout(w.idleTimer);delete global.$;}
 });

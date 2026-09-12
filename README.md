@@ -1,72 +1,94 @@
 # Up and Out
 
-A portrait elevator adventure: eleven busy floors, one player instruction, Pip's request, a held final frame and a crossfade into the camera. The existing panel remains interactive; the floor picker provides larger touch targets.
+A 9:16 glass-elevator adventure with 45 illustrated rooms, 45 named factory workers, one movement instruction per visit, and a real-world favour. The request ends on a held frame and crossfades into the camera. After an offering, the character replies with a fresh rhyming verdict, the grade lands on the visitor's photo, and successful offerings unlock a spoken keepsake.
+
+Artwork is being delivered in batches. All 45 room packages are implemented; rooms with an incomplete image pair are marked in the directory and cannot be entered yet. The latest pushed batch is listed in `docs/image-progress.json`.
 
 ## Run
 
 ```powershell
 npm install
-Copy-Item .env.example .env # only for a fresh checkout; keep an existing .env
+Copy-Item .env.example .env # fresh checkout only; preserve an existing .env
 npm start
 ```
 
-The current local demo is running at http://localhost:3100. A fresh checkout defaults to port 3000. `npm run dev` uses the illustrated rehearsal with no live video charges. The experience drawer switches between live video and illustrated preview. Provider libraries and Reactor WASM are bundled locally by `npm run build`, also run before start/dev.
+A fresh checkout defaults to port 3000. The current local demo uses http://localhost:3100. Browser providers and Reactor WASM are bundled locally by `npm run build`, which also runs before start/dev.
 
-## Demo journey
+The experience drawer has three modes:
 
-Choose a floor, watch the introduction, enter one movement instruction, and watch Pip approach with the request. The app explicitly plays each H3 clip once. After the request finishes, it captures the last available video frame, terminates the Reactor session and fades in the camera with the floor-specific question. There is no return-to-elevator clip, looping or cut to black.
+- **Live video:** Reactor animation, Anthropic offering checks and ElevenLabs speech.
+- **Illustrated + real quests:** the room illustrations move gently; checks, rhyming replies and ElevenLabs recordings are real. This is useful for testing a complete favour without generating video.
+- **Practice preview:** illustrated rehearsal, explicitly simulated grades and browser speech. `npm run dev` forces this mode with `MOCK_AI=1`.
 
-`DEMO_MODE=1` adds **demo: skip photo check**. This takes the story to Pip's return and a browser-spoken preview reward. The interface labels the skipped check. It cannot unlock a verified ElevenLabs reward or agent session. Switch it off for a real quest flow.
+`DEMO_MODE=1` also adds an explicit photo skip. It cannot award a checked keepsake or conversation session.
 
-## Content
+## Room content and images
 
-- `public/js/floors.js`: authoritative floor definitions, two portrait references per floor, introduction/movement/encounter/reunion prompts, spoken question, paired photo rubric and reward text.
-- `public/assets/floors/mobile/`: the existing 22 floor images plus Pip's character reference. Arrival images retain the near elevator wall, door jamb and threshold. Encounter images show the same room and Pip from a second angle.
-- `/floor-guide.html`: browse every image pair with the scripts and prompts. Regenerate it and `docs/floor-manifest.json` with `node scripts/floor-guide.js` after content edits.
-- `public/js/journey.js`: mobile UI, locked sequence, camera, recovery and voice controls.
-- `public/js/player.js`: illustrated and H3 players. H3 uses `get_state` to bootstrap its command snapshot, explicit generation/playback, `set_canvas` with `9:16`, and hold-last-frame mode. `continue_from_clip_id` supplies continuity within one connection; after a quest or idle timeout a new session uses the floor references again.
-- `server/api.js`, `server/journeys.js`, `server/providers.js`: session ownership, progression, provider access and reward gates. Secrets never enter the browser.
+The 38 canonical rooms follow the supplied four walls (10, 10, 9, 9), followed by seven legend rooms. The directory supports wall filters and search. Existing lift-panel hotspots map to canonical room IDs.
 
-The old LingBot planning documents and legacy app/world scripts are historical; the page now loads `player.js` and `journey.js`.
+- `docs/room-requests.json` and `docs/room-image-prompts.md` preserve the supplied source content.
+- `public/js/rooms-data.js` exposes the room requests to the browser; `public/js/floors.js` adds the authored tour, movement, encounter and return plans.
+- `public/assets/rooms/{id}-arrival.png` shows each busy room from halfway inside the glass lift. `{id}-encounter.png` shows its worker closer to the viewer, at another angle in that room.
+- The images use the supplied scratchy ink and loose watercolour reference, preserved in `docs/visual-reference.webp`. Each room has its own layout, objects, cast and activity. The mobile viewport is exactly 9:16; source images are validated within a small aspect-ratio tolerance.
+- `docs/room-image-prompts.json` contains the full 90 generation prompts; batch manifests record generated files. Images are produced with the built-in image tool and saved inside this checkout.
+- `/floor-guide.html` is the browsable authoring guide with both reference images, the full request, shared and room-specific rubrics, voice samples and video prompts. `npm run build` regenerates it and `docs/floor-manifest.json`.
 
-## Services
+The previous live-action images and old LingBot documents remain historical assets; the current app uses the new room manifest.
 
-Reactor uses `REACTOR_API_KEY` and the fixed model `reactor/h3-reference-to-video-turbo-realtime`. A new connection gets a model-scoped token allowing one session. The default per-session limit is 300 seconds, capped at 900. Idle sessions close after 45 seconds. Initial generation and connection failures have visible retries; they never silently switch a live visit into a simulation.
+## Grading and the verdict
 
-Real photo checking requires `ANTHROPIC_API_KEY`. The server selects the floor rubric; the browser cannot provide its own task. Every readable photo result gets a character response scene. Only A/A* with apparent real-world provenance and a visible hand unlocks a reward; lower grades return to a retry button after the response. Wrong photos, malformed results and provider outages do not pass. Photos are processed in memory and are not written to disk. A single-image check is not proof of capture authenticity.
+`server/providers.js` assembles the supplied shared grading prompt plus the selected room's own grading block. The server accepts either a photo or a typed offering, never a browser-supplied rubric. Images are inspected with Anthropic. A real, suitable find may earn A* without a hand in frame; a typed offering caps at A. Screens, catalogue images and uncertain evidence cap at C. Grades are A*, A, B, C, D and F. A single image cannot prove capture authenticity.
 
-ElevenLabs speech requires `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID`. The same voice delivers the initial request and the photo-specific reply. Successful replies become downloadable MP3 keepsakes. `ELEVENLABS_TTS_MODEL` defaults to `eleven_v3`; its performance tags are kept out of captions and omitted for older models. Live conversation additionally requires `ELEVENLABS_AGENT_ID`. Configure the agent as Pip and include these dynamic variables in its dashboard prompt:
+The model returns JSON containing `grade`, `headline`, `response`, `ttsResponse`, `flag`, `provenance`, `observedObject` and `visualDetails`. Every unflagged reply contains 30–55 spoken words ending in a new two-line rhyming verdict, in that room's character. The application validates the shape, word count, evidence limits and matching spoken words. Malformed responses get one bounded format retry; provider outages do not become passing grades. Moderated content produces only a gentle request to find something else and is not described in a video prompt.
+
+`server/response.js` constructs the next H3 scene using the current room, named worker, observed item, visible details, grade outcome and exact spoken reply. The raw visitor photo is not uploaded to Reactor. A/B/C/D/F reactions stay kind; only A*/A resolves a favour. The private-bar doorman keeps refusing entry at every grade, as specified in the source rules.
+
+The camera closes, the character responds, and then the submitted photo or typed answer receives a grade stamp. The clean transcript preserves the closing couplet. Lower grades offer another attempt and a cached voice replay. A*/A unlocks a downloadable MP3 of that personalised reply. Reloads restore the verdict and the visitor's image from this tab's session storage; returning to the lift clears that image. Photos are processed in server memory and never written to server disk.
+
+## Provider setup
+
+Keep secrets in the ignored `.env`; never place them in browser code or commit them.
+
+- `REACTOR_API_KEY` enables `reactor/h3-reference-to-video-turbo-realtime`.
+- `ANTHROPIC_API_KEY` enables real offering checks. `ANTHROPIC_MODEL` defaults to `claude-sonnet-4-6`.
+- `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` enable the selected character voice. The existing voice is the fallback for all named workers; optional room-specific voice assignments can override it.
+- `ELEVENLABS_TTS_MODEL` defaults to `eleven_v3`. Two to four performance tags are retained only in its speech field; captions and older models use the clean transcript.
+- `ELEVENLABS_AGENT_ID` optionally enables a microphone conversation after a checked successful offering. It is separate from the generated verdict and is not required to complete a favour.
+
+The H3 player explicitly generates and plays each clip once, bootstraps `get_state`, sets `set_canvas` to `9:16`, and preserves the final frame. Speech starts when the character clip starts. Reactor's native audio is muted during the external voice; if the full supplied request or verdict is longer than the clip, the final frame holds until speech ends. This coordinates the words and video, but does not guarantee phoneme-level lip sync. Illustration mode plays the same full ElevenLabs recording over the corresponding image.
+
+Reactor sessions use model-scoped, single-session tokens and close after the camera handoff, verdict or 45 seconds idle. The default session cap is 300 seconds, bounded at 900. Reviewing a saved verdict does not open a video session. Visit state belongs to an HTTP-only session and is held in one Node process for four hours. A restart ends unfinished visits; multi-process deployment requires a shared store. Phone camera access needs HTTPS or localhost.
+
+An optional conversation agent should use the same voice and these dynamic variables:
 
 ```text
-You are {{character_name}}, a kind, eccentric factory guide in {{floor_name}}.
-{{quest_status}} The visitor brought {{quest_object}}.
-Thank them, answer briefly in character and talk about this room. Never ask for
-personal details or more photos. The quest is already complete.
+You are {{character_name}}, a kind, eccentric factory worker in {{floor_name}}.
+{{quest_status}} The visitor offered {{quest_object}}.
+Speak briefly and warmly in character. The favour is complete; do not ask for
+personal details, more photos, or access beyond the room's story rules.
 ```
 
-Set the agent's voice to the same voice as `ELEVENLABS_VOICE_ID`. The server issues a signed WebSocket URL only after a real photo pass and reunion. The microphone starts only when the visitor taps Talk to Pip; exit, page hiding and a three-minute cap stop the call. The video remains a held image during voice conversation; live lip synchronization is not implemented.
-
-Visit state is held in this single Node process for four hours and can be resumed after a page reload. A server restart ends unfinished visits. Deploying multiple processes requires a shared session store. Real phone camera access requires HTTPS or localhost.
+The microphone starts only after the visitor taps the conversation button. Exit, page hiding and a three-minute cap stop it. Conversation uses the held character image.
 
 ## Verification
 
 ```powershell
-npm run check
+npm run check # strict: all 90 images must be present
+node scripts/check.js --allow-pending-images # validate a partial artwork delivery
 npm test
-npm run test:browser:response # isolated grading fixtures: fail, reload, retry, pass
-npm run test:browser # running demo server on localhost:3100; installed Chrome
+npm run test:browser
+npm run test:browser:response
 ```
 
-The browser check covers portrait layout, the full illustrated journey, actual browser camera acquisition with a test device, photo capture and track cleanup, gated rewards, page reload, a second floor and the explicit demo skip.
+Unit and browser tests cover all room definitions, evidence caps, moderation, ownership, one-instruction progression, portrait layout, wall filters, camera cleanup, typed answers, grade stamps, reload and retry. Browser fixtures are explicitly simulated and do not claim provider proof.
 
-A bounded real Reactor check was completed against the supplied local key: tour, one translated instruction, encounter, `clip_finished`, frozen frame, session teardown and camera handoff. The server's 9:16 canvas emits 768x1344 video; the app presents it within a 9:16 viewport. Screenshots and lifecycle evidence are in the ignored `artifacts/` directory. Photo grading and ElevenLabs calls remain unverified without their respective credentials.
+Bounded live checks use the configured providers and incur their normal usage:
 
-An optional billed repeat is available with `LIVE_REACTOR_TEST=1` and `node tests/live-reactor.cjs`. It runs only when explicitly enabled.
+```powershell
+$env:LIVE_QUEST_TEST='1'
+node tests/live-quest.cjs
+$env:LIVE_REACTOR_TEST='1'
+node tests/live-reactor.cjs
+```
 
-## Personalised photo response
-
-`server/response.js` constructs the character dialogue and H3 prompt from the photo checker JSON: `grade`, `provenance`, `observedObject`, `visualDetails`, and `headline`. The server adds an authored `response`, a performed `ttsResponse`, a grade-dependent `rewardLabel`, and a unique result ID. A screen/catalogue or uncertain result cannot receive a passing grade. The raw photo is not retained or uploaded to Reactor; only the bounded visual observations are included as data alongside the existing room and character references.
-
-After grading, the camera closes and Pip returns for every grade. `/api/speech` generates and caches the current reply using the configured character voice. The player starts it when the character clip begins, mutes Reactor's native audio and holds the final frame if the recording runs longer. This coordinates the dialogue and scene; it does not guarantee phoneme-level lip sync. The grade stamp lands after the response finishes. Unsuccessful attempts offer another photo and cannot unlock a keepsake or agent conversation. Reloads retain the result and its stamp for the lifetime of the server visit.
-
-The Do Me a Favor reference informed the separate clean/performed transcripts, provenance checks, grade-dependent response and recording reuse. Missing voice setup is visibly labelled and captions remain usable; configured provider failures offer a retry rather than pretending speech succeeded. Illustrated preview grades and browser voices remain explicitly simulated.
+The offering check verifies a real Anthropic illustration rejection and typed A, fresh couplets, constructed video prompts, actual ElevenLabs recordings, cached replay and a gated keepsake. The Reactor check exercises a complete illustrated-reference video visit through the camera and dynamic graded return. Local screenshots, event records and recordings are saved in ignored `artifacts/`; these checks do not deploy the app.

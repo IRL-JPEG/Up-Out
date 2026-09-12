@@ -5,10 +5,10 @@ function deadline(promise, ms, message) {
 }
 class PreviewWorld {
   constructor() { this.preview = true; this.closed = false; }
-  async stage(floor) {
+  async stage(floor, options = {}) {
     this.floor = floor;
     this.image = document.createElement("img"); this.image.className = "floor-image";
-    this.image.alt = floor.label; this.image.src = floor.references[0];
+    this.image.alt = floor.label; this.image.src = floor.references[options.encounter ? 1 : 0];
     await this.image.decode();
     if(this.closed) throw new Error("Visit ended.");
     $("worldMedia").replaceChildren(this.image);
@@ -33,12 +33,12 @@ class ReactorWorld {
     this.journeyId = journeyId; this.sdk = sdk; this.preview = false;
     this.references = new Map(); this.waiters = new Set(); this.epoch = 0; this.closed = false; this.diagnostics = [];
   }
-  async stage(floor) {
+  async stage(floor, options = {}) {
     this.floor = floor;
     this.poster = document.createElement("img"); this.poster.className = "floor-image";
-    this.poster.src = floor.references[0]; this.poster.alt = floor.label;
+    this.poster.src = floor.references[options.encounter ? 1 : 0]; this.poster.alt = floor.label;
     await this.poster.decode(); if(this.closed) throw new Error("Visit ended."); $("worldMedia").replaceChildren(this.poster);
-    await this.connect();
+    if (options.connect !== false) await this.connect();
   }
   async connect() {
     clearTimeout(this.idleTimer);
