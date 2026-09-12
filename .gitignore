@@ -3,3 +3,5 @@ node_modules
 public/seeds/*.jpg
 public/seeds/*.png
 public/intro/*.mp4
+public/vendor/
+artifacts/

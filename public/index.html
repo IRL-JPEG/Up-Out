@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/app.css" />
+<link rel="stylesheet" href="css/journey.css" />
 </head>
 <body>
 <div id="app">
@@ -22,7 +23,7 @@
         <g id="hots"></g>
       </svg>
     </div>
-    <div id="iris"><div style="text-align:center"><h1>Up and Out</h1><p>tap to step in</p></div></div>
+    <button id="iris" type="button"><span style="text-align:center"><span class="introTitle">Up and Out</span><span class="introHint">tap to step in</span></span></button>
   </div>
 
   <div id="transit">
@@ -40,6 +41,8 @@
   </div>
 
   <div id="world">
+    <div id="worldMedia"></div>
+    <img id="previewPip" alt="Pip, your factory guide" src="assets/floors/mobile/pip.png" hidden />
     <svg id="sign" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#wobble)">
         <rect x="10" y="14" width="400" height="112" rx="10" fill="#fff6c9" stroke="#2b2a2e" stroke-width="4"/>
@@ -51,9 +54,16 @@
   </div>
   <div id="doors" class="closed"><div class="door l"></div><div class="door r"></div></div>
 
-  <div class="topright"><button class="chip" id="liveBtn" type="button">live world</button></div>
+  <div class="topright"><button class="chip" id="liveBtn" type="button">experience</button></div>
+  <div class="topleft"><button class="chip" id="floorMenu" type="button">all floors</button></div>
+  <div id="floorName" hidden></div>
+  <section id="gradeStamp" hidden aria-live="polite"><strong id="gradeValue"></strong><span id="gradeLabel"></span></section>
+  <p id="voiceNotice" hidden role="status"></p>
   <div class="chips">
     <button class="chip" id="stepIn" type="button" hidden>back to the lift</button>
+    <button class="chip" id="resumeQuest" type="button" hidden>help Pip</button>
+    <button class="chip" id="playDialogue" type="button" hidden>Hear Pip</button>
+    <button class="chip" id="unmuteVideo" type="button" hidden>turn on sound</button>
   </div>
   <div class="pad" id="pad" hidden>
     <button class="fwd" data-k="fwd">↑</button>
@@ -62,41 +72,66 @@
     <button class="r" data-k="right">→</button>
   </div>
 
-  <div id="quest">
-    <h2>Storeroom 54 is dark</h2>
-    <p id="questText">Someone in there needs a light bulb. Find one, hold it in your hand, and take a photo of it.</p>
-    <img id="shot" alt="" />
-    <div id="verdict"></div>
-    <div class="row">
-      <button class="chip" id="openCam" type="button">open the camera</button>
-      <span class="small" id="noCam">no camera here</span>
+  <section id="storyStatus" class="story-card" aria-live="polite" hidden>
+    <p id="storyStatusText"></p><p id="storyError"></p>
+    <button class="chip" id="storyRetry" type="button" hidden>try this scene again</button>
+  </section>
+  <section id="choice" class="story-card" hidden aria-labelledby="choiceTitle">
+    <span class="eyebrow">A little adventure of your own</span>
+    <h2 id="choiceTitle">What shall we do now?</h2>
+    <form id="instructionForm"><label class="sr-only" for="instruction">Your next move</label>
+      <input id="instruction" maxlength="500" autocomplete="off" placeholder="Let's walk over there…" required />
+      <button class="chip" type="submit">let's go ↗</button>
+    </form><div id="suggestions"></div>
+  </section>
+  <dialog id="quest" aria-labelledby="questTitle">
+    <div id="cameraArea" hidden><video id="cameraView" autoplay muted playsinline></video></div>
+    <img id="shot" alt="Your quest photo, ready to check" />
+    <div class="cameraTop"><span class="eyebrow">From their world to yours</span><h2 id="questTitle">Pip needs a little help</h2><p id="questText"></p><p id="questPreview" class="small" hidden>Illustrated preview: the photo check is simulated.</p></div>
+    <div class="cameraFrame" aria-hidden="true"></div>
+    <div class="cameraBottom">
+      <div id="verdict" role="status"></div>
+      <p class="small">Your photo is sent for checking when you tap “show Pip”.</p>
+      <div class="row">
+        <button class="chip" id="openCam" type="button">open camera</button>
+        <button class="chip capture" id="takePhoto" type="button">take photo</button>
+        <button class="chip" id="submitPhoto" type="button" hidden>show Pip</button>
+        <button class="chip" id="retakePhoto" type="button" hidden>retake</button>
+      </div>
+      <div class="row secondary">
+        <button id="choosePhoto" type="button">choose a photo</button>
+        <button id="cancelCamera" type="button">stop camera</button>
+        <button id="questLater" type="button">a little later</button>
+        <button id="skipPhoto" type="button" hidden>demo: skip photo check</button>
+      </div>
     </div>
-    <input type="file" id="camInput" accept="image/*" capture="environment" hidden />
-  </div>
+    <input type="file" id="camInput" accept="image/jpeg,image/png,image/webp" hidden />
+  </dialog>
+  <section id="reward" class="story-card" hidden aria-labelledby="rewardTitle">
+    <span class="eyebrow">A little thank-you, just for you</span><h2 id="rewardTitle"></h2>
+    <p id="rewardText"></p><p id="rewardStatus" class="small" role="status"></p>
+    <button class="chip" id="playReward" type="button">play my voice keepsake</button>
+    <audio id="rewardAudio" controls hidden></audio><a id="downloadReward" hidden>save your keepsake</a>
+    <div class="conversation"><button class="chip" id="talkPip" type="button">talk to Pip</button><p id="agentHelp" class="small"></p><div id="chatTranscript" role="log" aria-label="Conversation with Pip"></div></div>
+  </section>
+  <dialog id="floorPicker" aria-labelledby="floorPickerTitle"><div class="pickerHead"><h2 id="floorPickerTitle">Where shall we go?</h2><button class="chip" id="closeFloors" type="button">close</button></div><div id="floorList"></div></dialog>
 
   <div class="ticket" id="ticket">
-    <div class="line" id="line">Tap to step in.</div>
+    <div class="line" id="line" aria-live="polite">Tap to step in.</div>
     <div class="meta">
       <div class="pips" id="pips"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
-      <div id="state">mock world</div>
+      <div id="state">Welcome aboard</div>
     </div>
   </div>
 
   <div class="drawer" id="drawer">
-    <h2>Live world</h2>
-    <p id="liveHelp">Streams a LingBot World 2 session behind the doors. The server mints a session-scoped token when you switch this on. Storeroom 54 never uses the world model.</p>
+    <h2>Your experience</h2>
+    <p id="liveHelp">Checking which experiences are ready…</p>
     <div class="row">
-      <button class="chip" id="useLive" type="button">use live world</button>
-      <button class="chip" id="useMock" type="button">back to mock</button>
+      <button class="chip" id="useLive" type="button">live video</button>
+      <button class="chip" id="useMock" type="button">illustrated preview</button>
       <button class="chip" id="closeDrawer" type="button">close</button>
     </div>
-    <details style="margin-top:14px">
-      <summary style="font-size:16px;cursor:pointer">advanced: paste a token instead</summary>
-      <label for="model">Model slug</label>
-      <input type="text" id="model" value="reactor/lingbot-world-2" />
-      <label for="jwt">Session JWT (never an rk_ key)</label>
-      <textarea id="jwt" placeholder="eyJ..."></textarea>
-    </details>
     <div class="log" id="log">log</div>
   </div>
 </div>
@@ -104,9 +139,9 @@
 
 <!-- classic scripts sharing one global scope, in dependency order -->
 <script src="js/content.js"></script>
+<script src="js/floors.js"></script>
 <script src="js/audio.js"></script>
-<script src="js/spatial.js"></script>
-<script src="js/worlds.js"></script>
-<script src="js/app.js"></script>
+<script src="js/player.js"></script>
+<script src="js/journey.js"></script>
 </body>
 </html>

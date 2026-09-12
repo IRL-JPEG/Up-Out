@@ -2,9 +2,35 @@
   "name": "up-and-out-web",
   "description": "Up and Out: lift panel, world-model floors on Reactor, Storeroom 54 fetch quest",
   "env": {
-    "REACTOR_API_KEY": { "description": "rk_ key from reactor.inc dashboard. Never shipped to the browser.", "required": false },
-    "REACTOR_MODEL": { "description": "Model slug for floors", "value": "reactor/lingbot-world-2", "required": false },
-    "ANTHROPIC_API_KEY": { "description": "For grading the light bulb photo", "required": false },
-    "MOCK_AI": { "description": "1 = grade without keys (always passes)", "value": "0", "required": false }
+    "REACTOR_API_KEY": {
+      "description": "rk_ key from reactor.inc dashboard. Never shipped to the browser.",
+      "required": false
+    },
+    "ANTHROPIC_API_KEY": {
+      "description": "For floor-specific photo observations and JSON grades",
+      "required": false
+    },
+    "MOCK_AI": {
+      "description": "1 forces an explicitly labelled illustrated preview",
+      "value": "0",
+      "required": false
+    },
+    "DEMO_MODE": {
+      "description": "1 enables the clearly labelled photo skip for demonstrations",
+      "value": "0",
+      "required": false
+    },
+    "ELEVENLABS_API_KEY": {
+      "description": "ElevenLabs server API key",
+      "required": false
+    },
+    "ELEVENLABS_VOICE_ID": {
+      "description": "Pip voice for requests, personalised replies and keepsakes",
+      "required": false
+    },
+    "ELEVENLABS_AGENT_ID": {
+      "description": "Pip conversation agent",
+      "required": false
+    }
   }
 }
