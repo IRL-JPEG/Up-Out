@@ -2,7 +2,7 @@
   "name": "up-and-out-web",
   "version": "0.1.0",
   "private": true,
-  "description": "Up and Out: lift panel, world-model floors on Reactor, Storeroom 54 fetch quest",
+  "description": "Up and Out: 45 illustrated factory rooms with portrait video, photo favours and personalised spoken verdicts",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",

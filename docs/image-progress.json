@@ -1,7 +1,7 @@
 {
   "expectedImages": 90,
-  "completedImages": 53,
-  "readyRooms": 23,
+  "completedImages": 90,
+  "readyRooms": 45,
   "rooms": [
     {
       "id": "chocolate-room",
@@ -97,49 +97,46 @@
       "id": "mint-jujubes",
       "room": "Mint jujubes for the boy next door",
       "available": [
-        "/assets/rooms/mint-jujubes-arrival.png"
-      ],
-      "pending": [
+        "/assets/rooms/mint-jujubes-arrival.png",
         "/assets/rooms/mint-jujubes-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "cavity-filling-caramels",
       "room": "Cavity-filling caramels",
       "available": [
-        "/assets/rooms/cavity-filling-caramels-arrival.png"
-      ],
-      "pending": [
+        "/assets/rooms/cavity-filling-caramels-arrival.png",
         "/assets/rooms/cavity-filling-caramels-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "stickjaw",
       "room": "Stickjaw for talkative parents",
       "available": [
-        "/assets/rooms/stickjaw-arrival.png"
-      ],
-      "pending": [
+        "/assets/rooms/stickjaw-arrival.png",
         "/assets/rooms/stickjaw-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "wriggle-sweets",
       "room": "Wriggle-sweets",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/wriggle-sweets-arrival.png",
         "/assets/rooms/wriggle-sweets-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "invisible-chocolate-bars",
       "room": "Invisible chocolate bars",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/invisible-chocolate-bars-arrival.png",
         "/assets/rooms/invisible-chocolate-bars-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "sugar-coated-pencils",
@@ -217,65 +214,64 @@
       "id": "lickable-wallpaper",
       "room": "Lickable wallpaper",
       "available": [
-        "/assets/rooms/lickable-wallpaper-arrival.png"
-      ],
-      "pending": [
+        "/assets/rooms/lickable-wallpaper-arrival.png",
         "/assets/rooms/lickable-wallpaper-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "hot-ice-creams",
       "room": "Hot ice creams for cold days",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/hot-ice-creams-arrival.png",
         "/assets/rooms/hot-ice-creams-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "chocolate-milk-cows",
       "room": "Cows that give chocolate milk",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/chocolate-milk-cows-arrival.png",
         "/assets/rooms/chocolate-milk-cows-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "fizzy-lifting-drinks",
       "room": "Fizzy lifting drinks",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/fizzy-lifting-drinks-arrival.png",
         "/assets/rooms/fizzy-lifting-drinks-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "square-sweets",
       "room": "Square sweets that look round",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/square-sweets-arrival.png",
         "/assets/rooms/square-sweets-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "butterscotch-buttergin",
       "room": "Butterscotch and buttergin",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/butterscotch-buttergin-arrival.png",
         "/assets/rooms/butterscotch-buttergin-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "strawberry-fudge-room",
       "room": "The Strawberry-Flavoured Chocolate-Coated Fudge Room",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/strawberry-fudge-room-arrival.png",
         "/assets/rooms/strawberry-fudge-room-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "juicing-room",
@@ -326,94 +322,91 @@
       "id": "vanilla-fudge-mountain",
       "room": "The Vanilla Fudge Mountain",
       "available": [
-        "/assets/rooms/vanilla-fudge-mountain-arrival.png"
-      ],
-      "pending": [
+        "/assets/rooms/vanilla-fudge-mountain-arrival.png",
         "/assets/rooms/vanilla-fudge-mountain-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "pounding-and-cutting-room",
       "room": "The Pounding and Cutting Room",
       "available": [
-        "/assets/rooms/pounding-and-cutting-room-arrival.png"
-      ],
-      "pending": [
+        "/assets/rooms/pounding-and-cutting-room-arrival.png",
         "/assets/rooms/pounding-and-cutting-room-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "spotty-powder-room",
       "room": "The Spotty Powder room",
       "available": [
-        "/assets/rooms/spotty-powder-room-arrival.png"
-      ],
-      "pending": [
+        "/assets/rooms/spotty-powder-room-arrival.png",
         "/assets/rooms/spotty-powder-room-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "never-melting-ice-cream",
       "room": "The never-melting ice cream store",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/never-melting-ice-cream-arrival.png",
         "/assets/rooms/never-melting-ice-cream-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "violet-marshmallow-parlour",
       "room": "The violet marshmallow parlour",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/violet-marshmallow-parlour-arrival.png",
         "/assets/rooms/violet-marshmallow-parlour-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "colour-changing-caramels",
       "room": "The colour-changing caramel works",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/colour-changing-caramels-arrival.png",
         "/assets/rooms/colour-changing-caramels-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "feather-sweet-loft",
       "room": "The feather-sweet loft",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/feather-sweet-loft-arrival.png",
         "/assets/rooms/feather-sweet-loft-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "sugar-balloon-room",
       "room": "The sugar-balloon room",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/sugar-balloon-room-arrival.png",
         "/assets/rooms/sugar-balloon-room-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "sugar-bird-hatchery",
       "room": "The sugar-bird egg hatchery",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/sugar-bird-hatchery-arrival.png",
         "/assets/rooms/sugar-bird-hatchery-encounter.png"
-      ]
+      ],
+      "pending": []
     },
     {
       "id": "palace-annex",
       "room": "The Palace Annex",
-      "available": [],
-      "pending": [
+      "available": [
         "/assets/rooms/palace-annex-arrival.png",
         "/assets/rooms/palace-annex-encounter.png"
-      ]
+      ],
+      "pending": []
     }
   ]
 }

@@ -18,7 +18,7 @@ class PreviewWorld {
     const beat = this.plan.beat;
     this.image.src = this.floor.references[["ask", "reunion"].includes(beat) ? 1 : 0];
     await this.image.decode();
-    this.image.className = `floor-image motion-${beat}`;
+    this.image.className = `floor-image motion-${beat}`; this.image.style.animationPlayState = "running";
     if (onStarted) await onStarted();
     else if (beat === "ask") await Audio.say(this.floor.ask);
     else await wait(beat === "tour" ? 3500 : 2400);

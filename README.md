@@ -2,7 +2,7 @@
 
 A 9:16 glass-elevator adventure with 45 illustrated rooms, 45 named factory workers, one movement instruction per visit, and a real-world favour. The request ends on a held frame and crossfades into the camera. After an offering, the character replies with a fresh rhyming verdict, the grade lands on the visitor's photo, and successful offerings unlock a spoken keepsake.
 
-Artwork is being delivered in batches. All 45 room packages are implemented; rooms with an incomplete image pair are marked in the directory and cannot be entered yet. The latest pushed batch is listed in `docs/image-progress.json`.
+All 45 room packages include both finished illustrations: 90 portrait images in total. The full inventory is listed in `docs/image-progress.json`. The directory marks any missing image pair as unavailable, so incomplete future additions cannot open with broken artwork.
 
 ## Run
 
@@ -92,3 +92,5 @@ node tests/live-reactor.cjs
 ```
 
 The offering check verifies a real Anthropic illustration rejection and typed A, fresh couplets, constructed video prompts, actual ElevenLabs recordings, cached replay and a gated keepsake. The Reactor check exercises a complete illustrated-reference video visit through the camera and dynamic graded return. Local screenshots, event records and recordings are saved in ignored `artifacts/`; these checks do not deploy the app.
+
+See `docs/demo-verification.md` for the checks actually completed and their limits, including the separate live Reactor introduction and return runs.
