@@ -32,7 +32,7 @@ function responseFor(result, floor) {
   const observedObject = policy.flag ? 'another thing' : clean(result.observedObject, 100) || 'your offering';
   const visualDetails = policy.flag ? '' : clean(result.visualDetails, 220);
   const response = policy.flag ? "Let's find something else together."
-    : result.mock ? `This is a practice reply from ${floor.character?.name || defaultCharacter.name}. Your ${policy.evidenceType === 'text' ? 'answer' : 'photo'} has not been checked, but now you can hear how our little thank-you works.\nA practice rhyme to end the day,\nOur real adventure waits to play.`
+    : result.mock ? `I’m ${floor.character?.name || defaultCharacter.name}. This is practice; your ${policy.evidenceType === 'text' ? 'answer' : 'photo'} hasn’t been checked.\nA practice rhyme to end the day,\nOur real adventure waits to play.`
       : clean(result.response);
   return { ...result, ...policy, observedObject, visualDetails, rewardLabel, response,
     ttsResponse: voiceScript(response, policy.flag || result.mock ? '' : result.ttsResponse), passed };

@@ -53,7 +53,7 @@ test("all rooms supply their own rubric and the shared gentle rhyme contract", (
     assert.ok(prompt.includes(floor.sharedGradingSystemPrompt || floor.validationPrompt));
     if (floor.grading) assert.ok(prompt.includes(floor.grading.roomBlock));
     assert.match(prompt, /A hand is helpful, never mandatory/);
-    assert.match(prompt, /no word-count limit/);
+    assert.match(prompt, /25-40 words total/);
     assert.match(prompt, /exactly two new original lines that rhyme/);
   }
 });

@@ -43,6 +43,12 @@ const { setup, openLift, visitChocolate, reachCamera, shortAudio, floors } = req
     for (const grade of ['F', 'A*']) {
       await page.waitForFunction(() => document.querySelector('#quest').classList.contains('camera-ready'));
       await page.locator('#takePhoto').click();
+      assert.equal(await page.locator('#submitPhoto').innerText(), 'Submit');
+      assert.equal(await page.locator('#retakePhoto').innerText(), 'Retake');
+      assert.equal(await page.locator('#questTitle').isVisible(), false);
+      assert.equal(await page.locator('#photoPrivacy').isVisible(), false);
+      assert.equal(await page.locator('#choosePhoto').isVisible(), false);
+      assert.equal(await page.locator('#questText').isVisible(), true);
       const photo = await page.locator('#shot').getAttribute('src');
       await page.locator('#submitPhoto').click();
       await page.locator('#reward').waitFor({ state: 'visible' });

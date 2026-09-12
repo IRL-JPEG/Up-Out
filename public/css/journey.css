@@ -77,6 +77,10 @@ dialog::backdrop { background:rgba(24,20,17,.28); }
 #quest.camera-ready #openCam { display:none; }
 #quest.has-photo #openCam, #quest.has-photo #takePhoto { display:none; }
 #quest.has-photo .cameraFrame { display:none; }
+#quest.has-photo .cameraTop .eyebrow, #quest.has-photo #questTitle,
+#quest.has-photo #photoPrivacy, #quest.has-photo .cameraBottom .secondary { display:none; }
+#quest.has-photo .cameraTop { padding-top:20px; }
+#quest.has-photo #questText { font-size:17px; }
 .capture { background:#dcebbd !important; }
 @media (max-width:600px) { #app { max-width:none; } }
 @media (max-height:690px) { .ticket .line {font-size:16px;min-height:34px}.story-card{bottom:96px;padding:13px}.cameraTop{padding:16px 18px 24px}#quest #questText{font-size:17px}.cameraBottom{padding:30px 16px 16px} }

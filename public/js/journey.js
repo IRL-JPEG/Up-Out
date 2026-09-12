@@ -221,7 +221,7 @@ $("storyRetry").onclick = async () => {
 };
 
 function showQuest() {
-  mode="quest"; $("gradeStamp").hidden=true; $("storyStatus").hidden=true; $("reward").hidden=true; $("questTitle").textContent=`${guide()} needs a little help`; $("submitPhoto").textContent=`show ${guide()}`; $("quest").classList.remove("typing"); $("answerForm").hidden=true; $("spokenAnswer").value="";
+  mode="quest"; $("gradeStamp").hidden=true; $("storyStatus").hidden=true; $("reward").hidden=true; $("questTitle").textContent=`${guide()} needs a little help`; $("submitPhoto").textContent="Submit"; $("quest").classList.remove("typing"); $("answerForm").hidden=true; $("spokenAnswer").value="";
   $("questText").textContent=floor().needShort || floor().quest.task;
   $("questPreview").hidden=!(journey.rehearsal??journey.preview); $("verdict").textContent=""; resetPhoto();
   $("skipPhoto").hidden = !CONFIG.demo;
