@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Up and Out</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+<div id="app">
+  <div id="scene">
+    <video id="intro" playsinline muted></video>
+    <div id="panelWrap">
+      <img id="panel" alt="The lift panel" src="assets/lift-panel.jpg" />
+      <svg id="overlay" viewBox="0 0 1280 2288" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="wobble" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+        </defs>
+        <g id="hots"></g>
+      </svg>
+    </div>
+    <div id="iris"><div style="text-align:center"><h1>Up and Out</h1><p>tap to step in</p></div></div>
+  </div>
+
+  <div id="transit">
+    <svg viewBox="0 0 360 150" id="dial" xmlns="http://www.w3.org/2000/svg">
+      <g filter="url(#wobble)">
+        <rect x="8" y="8" width="344" height="104" rx="14" fill="#f7f3ea" stroke="#2b2a2e" stroke-width="3"/>
+        <rect x="60" y="112" width="240" height="34" rx="8" fill="#f7f3ea" stroke="#2b2a2e" stroke-width="3"/>
+        <path d="M40 92 A140 140 0 0 1 320 92" fill="none" stroke="#2b2a2e" stroke-width="3"/>
+        <g id="ticks"></g>
+        <line id="needle" x1="180" y1="92" x2="180" y2="16" stroke="#c94b4b" stroke-width="4" stroke-linecap="round" transform="rotate(-70 180 92)"/>
+        <circle cx="180" cy="92" r="6" fill="#2b2a2e"/>
+      </g>
+      <text id="dialText" x="180" y="137" text-anchor="middle" style="font: 20px 'Patrick Hand', cursive; fill:#2b2a2e"></text>
+    </svg>
+  </div>
+
+  <div id="world">
+    <svg id="sign" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg">
+      <g filter="url(#wobble)">
+        <rect x="10" y="14" width="400" height="112" rx="10" fill="#fff6c9" stroke="#2b2a2e" stroke-width="4"/>
+        <circle cx="36" cy="40" r="6" fill="#f2c94b"/><circle cx="384" cy="40" r="6" fill="#f2c94b"/><circle cx="36" cy="100" r="6" fill="#f2c94b"/><circle cx="384" cy="100" r="6" fill="#f2c94b"/>
+      </g>
+      <text x="210" y="62" text-anchor="middle" style="font: 34px 'Patrick Hand', cursive; fill:#2b2a2e">Storeroom 54</text>
+      <text x="210" y="104" text-anchor="middle" style="font: 30px 'Patrick Hand', cursive; fill:#2b2a2e">The Creams. Open.</text>
+    </svg>
+  </div>
+  <div id="doors" class="closed"><div class="door l"></div><div class="door r"></div></div>
+
+  <div class="topright"><button class="chip" id="liveBtn" type="button">live world</button></div>
+  <div class="chips">
+    <button class="chip" id="stepIn" type="button" hidden>back to the lift</button>
+  </div>
+  <div class="pad" id="pad" hidden>
+    <button class="fwd" data-k="fwd">↑</button>
+    <button class="l" data-k="left">←</button>
+    <button class="b" data-k="back">↓</button>
+    <button class="r" data-k="right">→</button>
+  </div>
+
+  <div id="quest">
+    <h2>Storeroom 54 is dark</h2>
+    <p id="questText">Someone in there needs a light bulb. Find one, hold it in your hand, and take a photo of it.</p>
+    <img id="shot" alt="" />
+    <div id="verdict"></div>
+    <div class="row">
+      <button class="chip" id="openCam" type="button">open the camera</button>
+      <span class="small" id="noCam">no camera here</span>
+    </div>
+    <input type="file" id="camInput" accept="image/*" capture="environment" hidden />
+  </div>
+
+  <div class="ticket" id="ticket">
+    <div class="line" id="line">Tap to step in.</div>
+    <div class="meta">
+      <div class="pips" id="pips"><span class="pip"></span><span class="pip"></span><span class="pip"></span></div>
+      <div id="state">mock world</div>
+    </div>
+  </div>
+
+  <div class="drawer" id="drawer">
+    <h2>Live world</h2>
+    <p id="liveHelp">Streams a LingBot World 2 session behind the doors. The server mints a session-scoped token when you switch this on. Storeroom 54 never uses the world model.</p>
+    <div class="row">
+      <button class="chip" id="useLive" type="button">use live world</button>
+      <button class="chip" id="useMock" type="button">back to mock</button>
+      <button class="chip" id="closeDrawer" type="button">close</button>
+    </div>
+    <details style="margin-top:14px">
+      <summary style="font-size:16px;cursor:pointer">advanced: paste a token instead</summary>
+      <label for="model">Model slug</label>
+      <input type="text" id="model" value="reactor/lingbot-world-2" />
+      <label for="jwt">Session JWT (never an rk_ key)</label>
+      <textarea id="jwt" placeholder="eyJ..."></textarea>
+    </details>
+    <div class="log" id="log">log</div>
+  </div>
+</div>
+
+
+<!-- classic scripts sharing one global scope, in dependency order -->
+<script src="js/content.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/spatial.js"></script>
+<script src="js/worlds.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

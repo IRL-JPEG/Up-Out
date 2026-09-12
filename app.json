@@ -1,0 +1,10 @@
+{
+  "name": "up-and-out-web",
+  "description": "Up and Out: lift panel, world-model floors on Reactor, Storeroom 54 fetch quest",
+  "env": {
+    "REACTOR_API_KEY": { "description": "rk_ key from reactor.inc dashboard. Never shipped to the browser.", "required": false },
+    "REACTOR_MODEL": { "description": "Model slug for floors", "value": "reactor/lingbot-world-2", "required": false },
+    "ANTHROPIC_API_KEY": { "description": "For grading the light bulb photo", "required": false },
+    "MOCK_AI": { "description": "1 = grade without keys (always passes)", "value": "0", "required": false }
+  }
+}

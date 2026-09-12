@@ -1,0 +1,5 @@
+node_modules
+.env
+public/seeds/*.jpg
+public/seeds/*.png
+public/intro/*.mp4
