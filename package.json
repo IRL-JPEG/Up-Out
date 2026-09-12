@@ -13,7 +13,8 @@
     "test:browser": "node tests/browser.cjs",
     "prestart": "npm run build",
     "predev": "npm run build",
-    "test:browser:response": "node tests/browser-response.cjs"
+    "test:browser:response": "node tests/browser-response.cjs",
+    "test:browser:lift": "node tests/browser-lift.cjs"
   },
   "engines": {
     "node": ">=20"

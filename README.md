@@ -24,7 +24,11 @@ The experience drawer has three modes:
 
 ## Room content and images
 
-The 38 canonical rooms follow the supplied four walls (10, 10, 9, 9), followed by seven legend rooms. The directory supports wall filters and search. Existing lift-panel hotspots map to canonical room IDs.
+The 38 canonical rooms follow the supplied four walls (10, 10, 9, 9), followed by seven legend rooms. The directory supports wall filters and search.
+
+The supplied illustrated elevator panel is preserved at `public/assets/lift/illustrated-panel.png`. Its 38 labelled destinations use 77 transparent hit regions, grouping each label with its adjacent switch. `public/js/lift-panel.js` and `docs/lift-panel-map.json` record the native 1280×2276 coordinates and canonical room IDs. Keyboard focus and button presses highlight the existing artwork. The closer-view control enlarges the panel, with upper, middle and lower section shortcuts and touch panning; all 45 rooms remain in the directory.
+
+`public/js/lift-motion.js` and `public/css/lift.css` own the illustrated glass doors and moving lift shaft. Pressing a destination withdraws the panel and closes the doors; the floor is prepared behind them. The doors open only once the selected scene is ready, revealing that room's arrival reference before its tour starts. Returning closes the doors and restores the panel. Cancelling a pending visit stops its motion and prevents a late reveal. Reduced-motion settings use short transitions without continuous shaft movement.
 
 - `docs/room-requests.json` and `docs/room-image-prompts.md` preserve the supplied source content.
 - `public/js/rooms-data.js` exposes the room requests to the browser; `public/js/floors.js` adds the authored tour, movement, encounter and return plans.
@@ -78,6 +82,7 @@ node scripts/check.js --allow-pending-images # validate a partial artwork delive
 npm test
 npm run test:browser
 npm run test:browser:response
+npm run test:browser:lift
 ```
 
 Unit and browser tests cover all room definitions, evidence caps, moderation, ownership, one-instruction progression, portrait layout, wall filters, camera cleanup, typed answers, grade stamps, reload and retry. Browser fixtures are explicitly simulated and do not claim provider proof.

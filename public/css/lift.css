@@ -1,0 +1,41 @@
+/* Scoped lift choreography; the supplied panel image and hotspots remain intact. */
+#app.lift-motion-ready { --lift-ink:#3d4d48; --lift-wash:#e9e8da; }
+.lift-motion-ready #panelWrap { transform-origin:50% 45%; }
+.lift-motion-ready #panelWrap.approach,
+.lift-motion-ready #panelWrap.transit,
+.lift-motion-ready #panelWrap.arrive { animation:none !important; }
+.lift-motion-ready #world { background:#e9e8da; }
+.lift-motion-ready #doors { z-index:9; overflow:hidden; }
+.lift-motion-ready .door { width:50.3%; background:none; background-image:none; transition:none; will-change:auto; }
+.lift-motion-ready .door.l { left:0; }
+.lift-motion-ready .door.r { right:0; }
+.lift-motion-ready .door::after { display:none; }
+.lift-door-glass { display:block; width:100%; height:100%; overflow:visible; }
+.lift-door-glass, .lift-shaft-strip > svg, #liftCabinFrame > svg { filter:url(#lift-ink-grain); }
+.door.r .lift-door-glass { transform:scaleX(-1); }
+#liftTravel { position:absolute; inset:0; z-index:8; overflow:hidden; background:var(--lift-wash,#e9e8da); pointer-events:none; opacity:0; }
+.lift-shaft-strip { position:absolute; width:100%; height:200%; top:0; left:0; transform:translateY(-50%); }
+.lift-shaft-strip > svg { display:block; width:100%; height:50%; }
+.lift-shaft-shade { position:absolute; inset:0; box-shadow:inset 0 34px 45px #2a444123,inset 0 -35px 50px #78908020; background:linear-gradient(90deg,#748c9030,transparent 16%,#fffcef14 52%,transparent 83%,#748c9030); }
+#liftCabinFrame { position:absolute; inset:0; z-index:10; pointer-events:none; }
+#liftCabinFrame > svg { display:block; width:100%; height:100%; }
+.lift-motion-ready #transit { z-index:11; transition:none; pointer-events:none; }
+.lift-motion-ready #transit #dial { width:72%; max-width:360px; top:11%; filter:drop-shadow(0 3px 1px #42544920); }
+.lift-motion-ready #transit .shake { animation:none !important; }
+.lift-motion-ready[data-lift-phase="idle"] #liftTravel,
+.lift-motion-ready[data-lift-phase="idle"] #liftCabinFrame,
+.lift-motion-ready[data-lift-phase="idle"] #doors,
+.lift-motion-ready[data-lift-phase="idle"] #transit { visibility:hidden; }
+.lift-motion-ready[data-lift-phase="room"] #liftTravel,
+.lift-motion-ready[data-lift-phase="room"] #transit { visibility:hidden; }
+.lift-motion-ready[data-lift-phase="departing"] #panelWrap,
+.lift-motion-ready[data-lift-phase="travelling"] .lift-shaft-strip,
+.lift-motion-ready[data-lift-phase="arriving"] .door,
+.lift-motion-ready[data-lift-phase="returning"] #panelWrap,
+.lift-motion-ready[data-lift-phase="returning"] .door { will-change:transform,opacity; }
+.lift-motion-ready:not([data-lift-phase="idle"]) #overlay { pointer-events:none; }
+@media(prefers-reduced-motion:reduce) {
+  .lift-motion-ready .door,
+  .lift-motion-ready #panelWrap,
+  .lift-motion-ready .lift-shaft-strip { will-change:auto !important; }
+}

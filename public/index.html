@@ -8,20 +8,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/app.css" />
 <link rel="stylesheet" href="css/journey.css" />
+<link rel="stylesheet" href="css/lift.css" />
+<link rel="stylesheet" href="css/lift-panel.css" />
 </head>
 <body>
 <div id="app">
   <div id="scene">
     <video id="intro" playsinline muted></video>
+    <div id="panelViewport" aria-label="Illustrated lift button panel">
     <div id="panelWrap">
-      <img id="panel" alt="The lift panel" src="assets/lift-panel.jpg" />
-      <svg id="overlay" viewBox="0 0 1280 2288" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <img id="panel" alt="A glass lift full of illustrated buttons for 38 factory rooms" src="/assets/lift/illustrated-panel.png" draggable="false" />
+      <svg id="overlay" viewBox="0 0 1280 2276" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="wobble" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/></filter>
           <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
         </defs>
         <g id="hots"></g>
       </svg>
+    </div>
     </div>
     <button id="iris" type="button"><span style="text-align:center"><span class="introTitle">Up and Out</span><span class="introHint">tap to step in</span></span></button>
   </div>
@@ -56,6 +60,10 @@
 
   <div class="topright"><button class="chip" id="liveBtn" type="button">experience</button></div>
   <div class="topleft"><button class="chip" id="floorMenu" type="button">45 rooms</button></div>
+  <div id="panelTools" hidden>
+    <nav id="panelSections" aria-label="Closer views of the button panel" hidden><button type="button" data-section="upper">upper</button><button type="button" data-section="middle">middle</button><button type="button" data-section="lower">lower</button></nav>
+    <button class="chip" id="panelZoom" type="button" aria-pressed="false" aria-label="Enlarge lift buttons">closer look +</button>
+  </div>
   <div id="floorName" hidden></div>
   <section id="gradeStamp" hidden aria-live="polite"><strong id="gradeValue"></strong><span id="gradeLabel"></span></section>
   <p id="voiceNotice" hidden role="status"></p>
@@ -147,8 +155,10 @@
 <script src="js/content.js"></script>
 <script src="js/rooms-data.js"></script>
 <script src="js/floors.js"></script>
+<script src="js/lift-panel.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/player.js"></script>
+<script src="js/lift-motion.js"></script>
 <script src="js/journey.js"></script>
 </body>
 </html>

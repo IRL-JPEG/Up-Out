@@ -5,9 +5,10 @@ The local demo has configured Reactor video, Anthropic offering checks and Eleve
 ## Automated checks
 
 - All 90 reference images are present, decode successfully and meet the portrait aspect-ratio tolerance. Every room has a separate arrival and encounter image, with recorded generation prompts.
-- All 24 unit tests pass, covering the 45 room packages, exact supplied requests and rubrics, one-instruction progression, ownership, evidence limits, retry behaviour and matching voice/video scripts.
+- All 27 unit tests pass, covering the 45 room packages, exact supplied requests and rubrics, one-instruction progression, ownership, evidence limits, retry behaviour, matching voice/video scripts and the 38-room lift hit map.
 - The mobile browser journey passes: room directory and wall filters, search, portrait tour, full character request, camera handoff and cleanup, grade stamp, reload and explicit rehearsal skip.
 - The response browser journey passes: failed photo with retry, successful photo with a stamped verdict, typed offering capped at A, matching constructed video prompt, playable voice response and cached keepsake. These browser checks use isolated provider fixtures.
+- The illustrated lift browser journey passes: all 38 targets resolve from source-image coordinates to the correct on-screen buttons, closer-view sections work, Enter and Space visit the correct room, a double click creates one visit, and the doors stay closed until the scene is ready. Returning during preparation aborts the visit without a late door opening.
 
 ## Checks with the actual providers
 

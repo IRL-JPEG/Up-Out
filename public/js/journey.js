@@ -22,31 +22,48 @@ function sameVisit(id) { return id === generation && !controller?.signal.aborted
 function showError(error) {
   if (error.name === "AbortError" || !journey) return;
   mode = "error"; $("storyError").textContent = error.message; $("storyRetry").hidden = false;
+  $("storyStatus").classList.add("has-error");
   $("storyStatus").hidden = false; $("storyStatusText").textContent = "The story is waiting for you.";
   status("scene paused"); $("stepIn").hidden = false;
 }
 
-// Keep the existing panel, activate every named floor, and add the rink plaque.
-HOTS.push({ id: "coconut", kind: "floor", label: "Coconut Ice Rink", plaque: [48, 6.8, 71, 10.2], sw: [60, 11.4], wash: "#cfe6d6", drawPlaque: true });
-for (const h of HOTS) if (FloorContent.floors[h.id]) { h.kind = "floor"; h.panelLabel=h.label; h.label = FloorContent.floors[h.id].label; h.id = FloorContent.floors[h.id].id; }
+// The supplied artwork is one intact image; every labelled control has its own hit regions.
 const NS = "http://www.w3.org/2000/svg";
 function svg(tag, attrs, parent) { const n = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([k,v]) => n.setAttribute(k,v)); parent.append(n); return n; }
 const hotEls = {};
-for (const h of HOTS) {
-  const g = svg("g", { class: "hot", role: "button", tabindex: "0", "aria-label": h.label, "data-id": h.id }, $("hots")); hotEls[h.id] = g;
-  const [x1,y1,x2,y2] = h.plaque;
-  if (h.drawPlaque) {
-    svg("rect", { x: x1*12.8, y: y1*22.88, width: (x2-x1)*12.8, height: (y2-y1)*22.88, rx: 9, fill: h.wash, stroke: "#2b2a2e", "stroke-width": 4 }, g);
-    svg("text", { x: (x1+x2)*6.4, y: (y1+y2)*11.44+10, "text-anchor": "middle", style: "font-size:30px" }, g).textContent = h.panelLabel || h.label;
+$("overlay").setAttribute("viewBox", `0 0 ${LiftPanelContent.width} ${LiftPanelContent.height}`);
+for (const h of LiftPanelContent.sections) {
+  const g = svg("g", { class: "hot", role: "button", tabindex: "-1", "aria-label": h.label, "data-id": h.id, "aria-disabled":"true" }, $("hots")); hotEls[h.id] = g;
+  svg("title", {}, g).textContent = h.label;
+  for (const region of h.regions) {
+    const { type, ...attributes } = region;
+    svg(type, { ...attributes, class:"selection" }, g);
+    svg(type, { ...attributes, class:"hit" }, g);
   }
-  const sw = svg("g", { class: "sw" }, g);
-  svg("circle", { cx: h.sw[0]*12.8, cy: h.sw[1]*22.88, r: 40, fill: h.wash, stroke: "#2b2a2e", "stroke-width": 4 }, sw);
-  svg("rect", { class: "hit", x: x1*12.8-10, y: y1*22.88-10, width: (x2-x1)*12.8+20, height: (y2-y1)*22.88+20 }, g);
-  svg("circle", { class: "hit", cx: h.sw[0]*12.8, cy: h.sw[1]*22.88, r: 50 }, g);
-  const press = () => { if (mode === "idle") h.kind === "upandout" ? finale() : begin(h.id); };
+  const press = () => { if (mode === "idle" && g.getAttribute("aria-disabled") !== "true") begin(h.id); };
   g.addEventListener("click", press);
   g.addEventListener("keydown", e => { if (["Enter", " "].includes(e.key)) { e.preventDefault(); press(); } });
+  g.addEventListener("focus", () => { if ($("panelViewport").classList.contains("zoomed")) g.scrollIntoView({ block:"nearest", inline:"nearest" }); });
 }
+function setPanelActive(active) {
+  $("panelViewport").inert = !active; $("overlay").classList.toggle("on",active); $("panelTools").hidden = !active;
+  for(const [id,el] of Object.entries(hotEls)){
+    const enabled=active && CONFIG.readyFloors.includes(id);
+    el.setAttribute("aria-disabled",String(!enabled));el.setAttribute("tabindex",enabled?"0":"-1");
+  }
+}
+function setPanelZoom(zoom, section="middle") {
+  const viewport=$("panelViewport"); viewport.classList.toggle("zoomed",zoom);
+  $("panelZoom").setAttribute("aria-pressed",String(zoom));$("panelZoom").setAttribute("aria-label",zoom?"Show the whole lift":"Enlarge lift buttons");
+  $("panelZoom").textContent=zoom?"whole lift −":"closer look +";$("panelSections").hidden=!zoom;
+  for(const b of $("panelSections").children)b.setAttribute("aria-pressed",String(zoom&&b.dataset.section===section));
+  const position={upper:.23,middle:.49,lower:.74}[section]??.49;
+  viewport.scrollTo({left:zoom?(viewport.scrollWidth-viewport.clientWidth)/2:0,top:zoom?viewport.scrollHeight*position-viewport.clientHeight/2:0,behavior:"instant"});
+  if(mode==="idle")setLine(zoom?"Drag to explore. Tap a label to go.":"Tap a label. Every button has somewhere to go.");
+}
+$("panelZoom").onclick=()=>{if(mode==="idle")setPanelZoom(!$("panelViewport").classList.contains("zoomed"));};
+for(const b of $("panelSections").children)b.onclick=()=>{if(mode==="idle")setPanelZoom(true,b.dataset.section);};
+LiftMotion.reset();setPanelActive(false);$("floorMenu").hidden=true;$("liveBtn").hidden=true;
 for (let i=0;i<9;i++) {
   const a=(-70+i*17.5)*Math.PI/180;
   svg("line", { x1:180+Math.sin(a)*128,y1:92-Math.cos(a)*128,x2:180+Math.sin(a)*140,y2:92-Math.cos(a)*140,stroke:"#2b2a2e","stroke-width":3 }, $("ticks"));
@@ -74,11 +91,11 @@ function renderRooms(){
 $("roomSearch").oninput=renderRooms;renderRooms();
 $("floorMenu").onclick = () => { if (mode === "idle") $("floorPicker").showModal(); };
 $("closeFloors").onclick = () => $("floorPicker").close();
-const configReady = api("/api/config").then(c => { CONFIG = c; renderRooms(); preview = !c.live; rehearsal = c.preview || !c.live && c.grader === "unavailable"; $("useIllustrated").disabled=c.grader==="unavailable"; $("useLive").disabled = !c.live; $("liveHelp").textContent = c.live ? "Live floors are ready. Each scene takes a moment to come to life." : "Illustrated preview is ready. Live floors need Reactor setup on the server."; }).catch(() => { $("liveHelp").textContent = "The server is unavailable. Start the app server to enter a floor."; });
+const configReady = api("/api/config").then(c => { CONFIG = c; renderRooms(); if(mode==="idle")setPanelActive(true); preview = !c.live; rehearsal = c.preview || !c.live && c.grader === "unavailable"; $("useIllustrated").disabled=c.grader==="unavailable"; $("useLive").disabled = !c.live; $("liveHelp").textContent = c.live ? "Live floors are ready. Each scene takes a moment to come to life." : "Illustrated preview is ready. Live floors need Reactor setup on the server."; }).catch(() => { $("liveHelp").textContent = "The server is unavailable. Start the app server to enter a floor."; });
 $("iris").onclick = async () => {
   if (mode !== "intro") return; mode = "entering"; Audio.unlock(); $("iris").classList.add("gone");
-  $("panelWrap").classList.add("approach"); await Promise.all([wait(2200), configReady]);
-  $("overlay").classList.add("on"); mode = "idle"; status("choose a floor"); setLine("Every button has somewhere to go. Choose a floor.");
+  await Promise.all([wait(matchMedia("(prefers-reduced-motion: reduce)").matches?100:900), configReady, $("panel").decode().catch(()=>{})]);
+  mode = "idle"; setPanelActive(true);$("floorMenu").hidden=false;$("liveBtn").hidden=false;status("choose a floor");setLine("Tap a label. Every button has somewhere to go.");
   const saved = storage.get();
   if (saved) {
     try { const j = await api(`/api/journey/${saved}`); await enter(j); }
@@ -89,9 +106,9 @@ async function begin(floorId) {
   if (mode !== "idle") return;
   const canonical=FloorContent.floors[floorId]?.id;
   if(CONFIG.readyFloors && !CONFIG.readyFloors.includes(canonical)){setLine("This room is still being illustrated. Choose another in the room directory.");return;}
-  mode = "busy"; Audio.click();
-  try { await enter(await api("/api/journey", { floorId, preview, rehearsal })); }
-  catch (e) { if (journey) showError(e); else { mode = "idle"; setLine(e.message); } }
+  mode = "busy"; setPanelActive(false); hotEls[canonical]?.classList.add("on"); $("overlay").classList.add("on"); Audio.click();
+  try { const [visit]=await Promise.all([api("/api/journey", { floorId, preview, rehearsal }),wait(180)]);await enter(visit); }
+  catch (e) { if (journey) showError(e); else { mode = "idle"; setPanelActive(true);hotEls[canonical]?.classList.remove("on"); setLine(e.message); } }
 }
 async function enter(j) {
   controller?.abort(); controller = new AbortController(); const id = ++generation;
@@ -100,21 +117,22 @@ async function enter(j) {
   $("floorMenu").hidden = true; $("liveBtn").hidden = true; $("stepIn").hidden = false;
   $("floorName").textContent = floor().label; $("floorName").hidden = false;
   hotEls[j.floorId]?.classList.add("on");
-  $("panelWrap").classList.remove("arrive"); $("panelWrap").classList.add("transit"); $("overlay").classList.remove("on");
+  setPanelActive(false);setPanelZoom(false);
   $("dialText").textContent = floor().label; $("transit").classList.add("on"); $("dial").classList.add("shake");
   needleTarget = -65 + Object.keys(FloorContent.floors).indexOf(j.floorId) * 130 / (Object.keys(FloorContent.floors).length-1);
   Audio.setHum(0.06); status("on our way");
   try {
-    await world.stage(floor(), {connect:["tour","instruction","ask","reunion"].includes(j.state), encounter:["quest","reward","reunion"].includes(j.state)});
+    await Promise.all([LiftMotion.depart({signal:controller.signal}),world.stage(floor(), {connect:["tour","instruction","ask","reunion"].includes(j.state), encounter:["quest","reward","reunion"].includes(j.state)})]);
     if (!sameVisit(id)) return;
     if (j.state === "tour") await drive(id, true);
-    else { openDoors(); await drive(id); }
+    else { await openDoors(id); if(sameVisit(id))await drive(id); }
   } catch (e) { if (sameVisit(id)) { stopSpeech(); await world.disconnect().catch(() => {}); showError(e); } }
 }
-function openDoors() {
+async function openDoors(id = generation) {
   $("transit").classList.remove("on"); $("dial").classList.remove("shake");
-  $("world").classList.add("on"); $("doors").classList.remove("closed");
   Audio.ding(); Audio.setHum(0.015);
+  await LiftMotion.arrive({signal:controller?.signal});
+  if(!sameVisit(id))throw new DOMException("Visit ended","AbortError");
 }
 function stampGrade() {
   const r=journey?.result; $("gradeStamp").hidden=!r;
@@ -151,16 +169,19 @@ async function prepareDialogue(plan, id) {
 const beatLines = { tour: "The doors open. Take a little look around.", instruction: "Let's see where that takes us…", ask: "Wait. Someone is trying to get your attention…", reunion: "Someone has been waiting to say thank you." };
 async function drive(id = generation, first = false) {
   $("storyRetry").hidden = true; $("storyError").textContent = ""; $("choice").hidden = true;
+  $("storyStatus").classList.remove("has-error");
   try {
     while (sameVisit(id) && ["tour","instruction","ask","reunion"].includes(journey.state)) {
       mode = "busy"; const beat = journey.state;
       $("storyStatus").hidden = false; $("storyStatusText").textContent = journey.preview ? "Turning the storybook page…" : "Your next scene is coming to life…";
-      status("preparing the scene"); setLine(beatLines[beat]);
+      const enteringFloor=first || $("doors").classList.contains("closed");
+      status(enteringFloor?"on our way":"preparing the scene"); setLine(enteringFloor?"On our way. Hold on to your hat.":beatLines[beat]);
       const plan = await api(`/api/journey/${journey.id}/clip`, {});
       const speak = await prepareDialogue(plan, id);
       await world.prepare(plan); if (!sameVisit(id)) return;
-      if (first || $("doors").classList.contains("closed")) { openDoors(); await wait(1200); first = false; }
+      if (first || $("doors").classList.contains("closed")) { await openDoors(id); if(!sameVisit(id))return; first = false; }
       $("storyStatus").hidden = true; status(beat === "ask" ? `${guide()} needs your help` : "exploring");
+      if(enteringFloor)setLine(beatLines[beat]);
       if (beat === "ask") setLine(floor().ask);
       if (plan.dialogue) setLine(plan.dialogue);
       await world.play(speak); if (!sameVisit(id)) return;
@@ -342,12 +363,12 @@ async function backToLift() {
   $("rewardAudio").hidden=true;$("downloadReward").hidden=true;$("chatTranscript").replaceChildren();resetPhoto();
   if($("quest").open)$("quest").close();
   for(const id of ["choice","reward","storyStatus","resumeQuest","stepIn","floorName","unmuteVideo","gradeStamp","playDialogue","voiceNotice"])$(id).hidden=true;
-  $("doors").classList.add("closed");$("transit").classList.remove("on");$("dial").classList.remove("shake");
-  await world?.end().catch(()=>{});world=null;
+  $("transit").classList.remove("on");$("dial").classList.remove("shake");setPanelActive(false);setPanelZoom(false);
+  const previousWorld=world;world=null;
+  await Promise.all([previousWorld?.end().catch(()=>{}),LiftMotion.returnToPanel()]);
   fetch(`/api/journey/${old.id}`,{method:"DELETE"}).catch(()=>{});
-  await wait(1000);$("world").classList.remove("on");$("previewPip").hidden=true;
-  $("panelWrap").classList.remove("transit");$("panelWrap").classList.add("arrive");await wait(1200);
-  $("overlay").classList.add("on");$("floorMenu").hidden=false;$("liveBtn").hidden=false;mode="idle";
+  $("previewPip").hidden=true;for(const el of Object.values(hotEls))el.classList.remove("on");
+  $("floorMenu").hidden=false;$("liveBtn").hidden=false;mode="idle";setPanelActive(true);
   setLine("Back in the lift. Where shall we go next?");status("choose a floor");
 }
 $("stepIn").onclick=backToLift;
@@ -356,6 +377,6 @@ $("useLive").onclick=()=>{if(mode!=="idle"||!CONFIG.live)return;preview=false;re
 $("useMock").onclick=()=>{if(mode!=="idle")return;preview=true;rehearsal=true;status("choose a floor");$("drawer").classList.remove("open");};
 $("useIllustrated").onclick=()=>{if(mode!=="idle"||CONFIG.grader==="unavailable")return;preview=true;rehearsal=false;status("choose a floor");$("drawer").classList.remove("open");};
 async function finale(){if(completedFloors.size<3){setLine("Help three factory friends, then press Up and Out.");return;}setLine("Up and out. A pocketful of strange places, and a factory full of friends.");await Audio.say("Going up. Past the roof. Past the weather. Until next time.");}
-addEventListener("pagehide",()=>{controller?.abort();stopCamera();stopSpeech();stopChat().catch(()=>{});world?.end().catch(()=>{});});
+addEventListener("pagehide",()=>{controller?.abort();LiftMotion.reset();stopCamera();stopSpeech();stopChat().catch(()=>{});world?.end().catch(()=>{});});
 document.addEventListener("visibilitychange",()=>{if(document.hidden){stopCamera();stopChat().catch(()=>{});if(mode==="choice"||mode==="quest"||mode==="reward")world?.disconnect().catch(()=>{});}});
 function tick(){needle+=(needleTarget-needle)*.04;$("needle").setAttribute("transform",`rotate(${needle} 180 92)`);requestAnimationFrame(tick);}tick();

@@ -1,0 +1,29 @@
+/* Hit areas share the source image's coordinates; the artwork stays intact. */
+#panelViewport { position:absolute;inset:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;touch-action:pan-x pan-y pinch-zoom; }
+#panelViewport::-webkit-scrollbar { display:none; }
+#panelWrap { width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto; }
+#panelViewport.zoomed #panelWrap { width:185%;height:185%; }
+#overlay { transition:opacity .2s;pointer-events:none; }
+#overlay.on { pointer-events:auto; }
+#overlay .hot { outline:none;cursor:pointer; }
+#overlay .hit { stroke:none;fill:transparent;pointer-events:all; }
+#overlay .selection { fill:#f7d35b26;stroke:#806632;stroke-width:5;vector-effect:non-scaling-stroke;opacity:0;pointer-events:none;transition:opacity .15s; }
+#overlay .hot:hover .selection { opacity:.5; }
+#overlay .hot:focus-visible .selection, #overlay .hot.on .selection { opacity:1; }
+#overlay .hot:focus-visible .selection { stroke:#245b59;stroke-width:3; }
+#overlay .hot[aria-disabled="true"] { pointer-events:none; }
+#overlay .hot[aria-disabled="true"] .hit { pointer-events:none; }
+#panelTools { position:absolute;z-index:16;left:12px;right:12px;bottom:8.4%;display:flex;justify-content:center;align-items:center;gap:8px;pointer-events:none; }
+#panelTools>* { pointer-events:auto; }
+#panelTools .chip { font-size:15px;padding:5px 12px;box-shadow:2px 2px 0 #2b2a2e22;background:#fff9edee; }
+#panelSections { display:flex;border:1px solid #a79c88;border-radius:18px;overflow:hidden;background:#fff9edf5; }
+#panelSections button { font:14px var(--hand);border:0;border-right:1px solid #d3c8b6;padding:6px 9px;background:transparent;color:var(--ink);cursor:pointer; }
+#panelSections button:last-child { border:0; }
+#panelSections button[aria-pressed="true"] { background:#d7e6dd; }
+#app[data-lift-phase="idle"] .ticket { bottom:7px;padding:5px 12px;width:calc(100% - 26px);background:#fdf8eaeF; }
+#app[data-lift-phase="idle"] .ticket .line { font-size:15px;min-height:0;text-align:center; }
+#app[data-lift-phase="idle"] .ticket .meta { display:none; }
+#app[data-lift-phase="departing"] #panelTools, #app[data-lift-phase="travelling"] #panelTools, #app[data-lift-phase="arriving"] #panelTools, #app[data-lift-phase="returning"] #panelTools { display:none; }
+#app[data-lift-phase="departing"] #storyStatus:not(.has-error), #app[data-lift-phase="travelling"] #storyStatus:not(.has-error) { visibility:hidden; }
+#app[data-lift-phase="departing"] #floorName, #app[data-lift-phase="travelling"] #floorName { visibility:hidden; }
+@media (prefers-reduced-motion:reduce) { #overlay,#overlay .selection { transition:none; } }
