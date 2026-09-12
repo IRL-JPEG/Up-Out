@@ -18,7 +18,7 @@
     "test:browser:memories": "node tests/browser-memories.cjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",

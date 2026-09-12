@@ -10,6 +10,8 @@ function createApp(deps = {}) {
   const app = express(), journeys = new Journeys(), limits = new Map();
   const p = { ...providers, ...deps };
   app.disable("x-powered-by");
+  // Heroku adds the client address at the last hop through its router.
+  if (process.env.DYNO) app.set("trust proxy", 1);
   app.use("/api", (req, res, next) => {
     res.set("Cache-Control", "no-store");
     if (req.method !== "GET" && (req.get("sec-fetch-site") === "cross-site" || (req.get("origin") && new URL(req.get("origin")).host !== req.get("host")))) return res.status(403).json({ error: "Please use the app to do that." });

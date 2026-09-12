@@ -1,5 +1,5 @@
 {
-  "name": "up-and-out-web",
+  "name": "up-and-out",
   "description": "A portrait glass-elevator adventure with 45 illustrated rooms, photo favours and rhyming character verdicts",
   "env": {
     "REACTOR_API_KEY": {
@@ -26,10 +26,11 @@
     },
     "ELEVENLABS_VOICE_ID": {
       "description": "Default factory-worker voice for requests, rhyming replies and keepsakes",
+      "value": "NbvR1eY6Q8ivACdEO8PV",
       "required": false
     },
     "ELEVENLABS_AGENT_ID": {
-      "description": "Pip conversation agent",
+      "description": "Optional factory-worker conversation agent",
       "required": false
     }
   }
