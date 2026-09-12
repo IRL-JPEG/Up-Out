@@ -129,10 +129,14 @@ class ReactorWorld {
     if (!this.video) throw new Error("The video track did not arrive.");
     $("worldMedia").replaceChildren(this.video);
     await this.video.play();
+    this.responseFrames=[];
+    if(this.plan?.beat==="reunion")this.momentCapture=new (typeof VerdictMoments!=="undefined"?VerdictMoments:require('./moments')).Capture(this.video,this.plan.seconds).start();
     const speech = onStarted ? Promise.resolve().then(onStarted) : Promise.resolve();
     speech.catch(() => {});
     if (this.audio) this.audio.play().catch(() => { $("unmuteVideo").hidden = false; });
-    await finished;
+    try { await finished; }
+    catch(error){this.momentCapture?.cancel();this.momentCapture=null;throw error;}
+    this.responseFrames=this.momentCapture?.finish()||[];this.momentCapture=null;
     if (onStarted) this.holdFrame();
     await speech;
     this.lastClip = clipId;
@@ -147,6 +151,7 @@ class ReactorWorld {
     $("worldMedia").replaceChildren(still);
   }
   async disconnect() {
+    this.momentCapture?.cancel();this.momentCapture=null;
     this.holdFrame();
     clearTimeout(this.idleTimer); this.epoch++;
     this.rejectAll(new Error("Video session closed."));

@@ -14,7 +14,8 @@
     "prestart": "npm run build",
     "predev": "npm run build",
     "test:browser:response": "node tests/browser-response.cjs",
-    "test:browser:lift": "node tests/browser-lift.cjs"
+    "test:browser:lift": "node tests/browser-lift.cjs",
+    "test:browser:memories": "node tests/browser-memories.cjs"
   },
   "engines": {
     "node": ">=20"

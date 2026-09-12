@@ -30,7 +30,7 @@ The supplied illustrated elevator panel is preserved at `public/assets/lift/illu
 
 `public/js/lift-motion.js` and `public/css/lift.css` own the illustrated glass doors and moving lift shaft. Pressing a destination withdraws the panel and closes the doors; the floor is prepared behind them. The doors open only once the selected scene is ready, revealing that room's arrival reference before its tour starts. Returning closes the doors and restores the panel. Cancelling a pending visit stops its motion and prevents a late reveal. Reduced-motion settings use short transitions without continuous shaft movement.
 
-- `docs/room-requests.json` and `docs/room-image-prompts.md` preserve the supplied source content.
+- `docs/room-requests.json` and `docs/room-image-prompts.md` record the room content; the runtime output rules reflect subsequent requested changes.
 - `public/js/rooms-data.js` exposes the room requests to the browser; `public/js/floors.js` adds the authored tour, movement, encounter and return plans.
 - `public/assets/rooms/{id}-arrival.png` shows each busy room from halfway inside the glass lift. `{id}-encounter.png` shows its worker closer to the viewer, at another angle in that room.
 - The images use the supplied scratchy ink and loose watercolour reference, preserved in `docs/visual-reference.webp`. Each room has its own layout, objects, cast and activity. The mobile viewport is exactly 9:16; source images are validated within a small aspect-ratio tolerance.
@@ -43,11 +43,13 @@ The previous live-action images and old LingBot documents remain historical asse
 
 `server/providers.js` assembles the supplied shared grading prompt plus the selected room's own grading block. The server accepts either a photo or a typed offering, never a browser-supplied rubric. Images are inspected with Anthropic. A real, suitable find may earn A* without a hand in frame; a typed offering caps at A. Screens, catalogue images and uncertain evidence cap at C. Grades are A*, A, B, C, D and F. A single image cannot prove capture authenticity.
 
-The model returns JSON containing `grade`, `headline`, `response`, `ttsResponse`, `flag`, `provenance`, `observedObject` and `visualDetails`. Every unflagged reply contains 30–55 spoken words ending in a new two-line rhyming verdict, in that room's character. The application validates the shape, word count, evidence limits and matching spoken words. Malformed responses get one bounded format retry; provider outages do not become passing grades. Moderated content produces only a gentle request to find something else and is not described in a video prompt.
+The model returns JSON containing `grade`, `headline`, `response`, `ttsResponse`, `flag`, `provenance`, `observedObject` and `visualDetails`. Every unflagged reply ends in a new two-line rhyming verdict, in that room's character. Replies and headlines have no word-count minimum or maximum. The application validates the JSON shape, evidence limits and matching spoken words. Malformed responses get one bounded format repair using the failed answer while preserving its assessment; provider outages do not become passing grades. Moderated content produces only a gentle request to find something else and is not described in a video prompt.
 
 `server/response.js` constructs the next H3 scene using the current room, named worker, observed item, visible details, grade outcome and exact spoken reply. The raw visitor photo is not uploaded to Reactor. A/B/C/D/F reactions stay kind; only A*/A resolves a favour. The private-bar doorman keeps refusing entry at every grade, as specified in the source rules.
 
 The camera closes, the character responds, and then the submitted photo or typed answer receives a grade stamp. The clean transcript preserves the closing couplet. Lower grades offer another attempt and a cached voice replay. A*/A unlocks a downloadable MP3 of that personalised reply. Reloads restore the verdict and the visitor's image from this tab's session storage; returning to the lift clears that image. Photos are processed in server memory and never written to server disk.
+
+The verdict also keeps six snapshots from the actual return video beside the submitted photo in a swipeable carousel, with arrow buttons, keyboard navigation and audio replay. Decoded video timestamps determine the spacing across the clip; the capture pool is bounded and only six JPEGs are retained. The images stay in this browser tab, are tied to the current verdict, survive reload when storage permits, and are cleared on the next offering or return to the lift. Illustrated mode has no generated video to capture; unavailable or interrupted footage is never replaced with fabricated video frames.
 
 ## Provider setup
 
@@ -83,6 +85,7 @@ npm test
 npm run test:browser
 npm run test:browser:response
 npm run test:browser:lift
+npm run test:browser:memories
 ```
 
 Unit and browser tests cover all room definitions, evidence caps, moderation, ownership, one-instruction progression, portrait layout, wall filters, camera cleanup, typed answers, grade stamps, reload and retry. Browser fixtures are explicitly simulated and do not claim provider proof.

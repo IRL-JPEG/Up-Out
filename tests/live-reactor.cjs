@@ -39,6 +39,11 @@ const {chromium}=require("playwright"),fs=require("node:fs");
         await page.locator("#camInput").setInputFiles("public/assets/rooms/chocolate-room-arrival.png");
         await page.locator("#submitPhoto").click();offered=true;
       } else if(offered&&await page.locator("#reward").isVisible()) {
+        const moments=await page.evaluate(()=>VerdictMoments.read(journey.id,journey.result.id).map(f=>({time:f.time,bytes:f.image.length})));
+        if(moments.length!==6)throw new Error(`Expected six captured return-video moments, received ${moments.length}`);
+        if(await page.locator("#resultSlides .video-memory").count()!==6)throw new Error("The verdict is missing video slides");
+        console.log(JSON.stringify({capturedVideoMoments:moments}));
+        fs.writeFileSync("artifacts/live-video-moments.json",JSON.stringify(moments,null,2));
         await page.screenshot({path:"artifacts/live-video-verdict-mobile.png"});finished=true;break;
       }
     }

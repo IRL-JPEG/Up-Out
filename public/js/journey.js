@@ -185,6 +185,7 @@ async function drive(id = generation, first = false) {
       if (beat === "ask") setLine(floor().ask);
       if (plan.dialogue) setLine(plan.dialogue);
       await world.play(speak); if (!sameVisit(id)) return;
+      if(beat==="reunion"&&!journey.result?.flag)VerdictMoments.save(journey.id,journey.result?.id,world.responseFrames||[]);
       saveJourney(await api(`/api/journey/${journey.id}/complete`, { playbackId: plan.playbackId }));
     }
     if (!sameVisit(id)) return;
@@ -268,6 +269,7 @@ async function submitEvidence(evidence){
   const id=generation;
   try {
     const result=await api("/api/grade",{journeyId:journey.id,...evidence}); if(!sameVisit(id))return;
+    VerdictMoments.clear();
     try { sessionStorage.setItem("uo_evidence",JSON.stringify({visit:journey.id,photo:result.flag?null:evidence.image,answer:result.flag?null:evidence.answer})); }catch{}
     if(rewardUrl)URL.revokeObjectURL(rewardUrl);rewardUrl=null;
     saveJourney(result.journey);photo=null;stopCamera();$("quest").close();resetPhoto(); await drive(id);
@@ -289,6 +291,43 @@ $("skipPhoto").onclick=async()=>{
 $("resumeQuest").onclick=()=>{$("resumeQuest").hidden=true; if(journey?.state==="quest"){showQuest();openCamera();}};
 
 function showReward() { showResult(true); }
+let memoryIndex=0;
+function memorySlides(){return [...$("resultSlides").children].filter(el=>!el.hidden);}
+function updateMemoryPosition(){
+  const slides=memorySlides(),count=slides.length;
+  memoryIndex=Math.max(0,Math.min(count-1,Math.round($("resultSlides").scrollLeft/($("resultSlides").clientWidth||1))));
+  $("memoryPosition").textContent=`${memoryIndex+1} / ${count}`;
+  $("memoryPrevious").disabled=memoryIndex===0;$("memoryNext").disabled=memoryIndex>=count-1;
+  for(const [i,b]of [...$("memoryDots").children].entries())b.setAttribute("aria-current",String(i===memoryIndex));
+}
+function goToMemory(index){
+  const slides=memorySlides();index=Math.max(0,Math.min(slides.length-1,index));
+  $("resultSlides").scrollTo({left:index*$("resultSlides").clientWidth,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});
+}
+$("memoryPrevious").onclick=()=>goToMemory(memoryIndex-1);$("memoryNext").onclick=()=>goToMemory(memoryIndex+1);
+$("resultSlides").addEventListener("scroll",updateMemoryPosition,{passive:true});
+$("resultSlides").addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();goToMemory(memoryIndex+(e.key==="ArrowRight"?1:-1));}});
+function showMemories(){
+  for(const el of $("resultSlides").querySelectorAll(".video-memory"))el.remove();
+  const original=$("resultOriginal");original.hidden=$("resultPhoto").hidden&&$("resultAnswer").hidden;
+  original.querySelector("figcaption").textContent=$("resultPhoto").hidden?"Your answer":"Your find";
+  const frames=journey.result?.flag?[]:VerdictMoments.read(journey.id,journey.result?.id);
+  for(const [i,frame]of frames.entries()){
+    const slide=document.createElement("figure");slide.className="result-slide video-memory";
+    slide.style.setProperty("--moment-image",`url("${frame.image}")`);
+    const img=document.createElement("img");img.src=frame.image;img.alt=`${guide()} in your response video, moment ${i+1}`;
+    const caption=document.createElement("figcaption");caption.textContent=`In the room · ${Math.floor(frame.time/60)}:${String(Math.floor(frame.time%60)).padStart(2,"0")}`;
+    slide.append(img,caption);$("resultSlides").append(slide);
+  }
+  $("resultEvidence").classList.toggle("has-moments",frames.length>0);
+  const slides=memorySlides();$("resultSlides").hidden=!slides.length;$("memoryControls").hidden=slides.length<2;$("memoryDots").hidden=slides.length<2;
+  $("memoryDots").replaceChildren();
+  slides.forEach((slide,i)=>{
+    slide.setAttribute("role","group");slide.setAttribute("aria-roledescription","slide");slide.setAttribute("aria-label",`${i+1} of ${slides.length}`);
+    const b=document.createElement("button");b.type="button";b.setAttribute("aria-label",`Show ${slide.querySelector("figcaption").textContent}`);b.onclick=()=>goToMemory(i);$("memoryDots").append(b);
+  });
+  $("resultSlides").scrollLeft=0;memoryIndex=0;updateMemoryPosition();
+}
 function showResult(passed) {
   mode=passed?"reward":"quest"; const r=journey.result;
   if(passed){completedFloors.add(journey.floorId);setPips(completedFloors.size);hotEls[journey.floorId]?.classList.add("lit");}
@@ -299,6 +338,7 @@ function showResult(passed) {
     if(evidence.photo){$("resultPhoto").src=evidence.photo;$("resultPhoto").hidden=false;}
     else if(evidence.answer){$("resultAnswer").textContent=evidence.answer;$("resultAnswer").hidden=false;}
   }}catch{}
+  showMemories();
   $("resultStamp").textContent=r?.grade||"";$("resultStamp").setAttribute("aria-label",`Grade ${r?.grade||""}`);$("resultStamp").removeAttribute("aria-hidden");
   $("resultCharacter").textContent=`${guide()} has spoken${r?.mock?" · preview verdict":""}`;
   $("rewardTitle").textContent=r?.headline || "A little thank-you";
@@ -356,7 +396,8 @@ $("unmuteVideo").onclick=async()=>{try{await world?.audio?.play();$("unmuteVideo
 
 async function backToLift() {
   if(!journey)return;
-  const old=journey; generation++;controller?.abort();controller=null;journey=null;storage.set(null);try{sessionStorage.removeItem("uo_evidence");}catch{}mode="busy";
+  const old=journey; generation++;controller?.abort();controller=null;journey=null;storage.set(null);VerdictMoments.clear();try{sessionStorage.removeItem("uo_evidence");}catch{}mode="busy";
+  for(const el of $("resultSlides").querySelectorAll(".video-memory"))el.remove();
   stopCamera();stopSpeech();await stopChat().catch(()=>{});$("rewardAudio").pause();$("rewardAudio").removeAttribute("src");
   if(rewardUrl)URL.revokeObjectURL(rewardUrl);rewardUrl=null;
   if(dialogueUrl)URL.revokeObjectURL(dialogueUrl);dialogueUrl=null; dialogueAudio.removeAttribute("src");

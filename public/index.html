@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/journey.css" />
 <link rel="stylesheet" href="css/lift.css" />
 <link rel="stylesheet" href="css/lift-panel.css" />
+<link rel="stylesheet" href="css/memories.css" />
 </head>
 <body>
 <div id="app">
@@ -119,11 +120,18 @@
   </dialog>
   <section id="reward" class="story-card" hidden aria-labelledby="rewardTitle">
     <span class="eyebrow" id="resultEyebrow">The verdict</span>
-    <div id="resultEvidence" hidden><img id="resultPhoto" alt="The thing you brought" /><p id="resultAnswer" hidden></p><div id="resultStamp" aria-hidden="true"></div></div>
+    <button class="chip" id="playReward" type="button">hear the verdict again</button>
+    <div id="resultEvidence" hidden>
+      <div id="resultSlides" role="region" aria-roledescription="carousel" aria-label="Your photo and video memories" tabindex="0">
+        <figure class="result-slide" id="resultOriginal"><img id="resultPhoto" alt="The thing you brought" /><p id="resultAnswer" hidden></p><figcaption>Your find</figcaption></figure>
+      </div>
+      <div id="resultStamp" aria-hidden="true"></div>
+      <div id="memoryControls" hidden><button id="memoryPrevious" type="button" aria-label="Previous memory">←</button><span id="memoryPosition" role="status" aria-live="polite"></span><button id="memoryNext" type="button" aria-label="Next memory">→</button></div>
+      <div id="memoryDots" aria-label="Choose a memory" hidden></div>
+    </div>
     <p id="resultCharacter" class="small"></p><h2 id="rewardTitle"></h2>
     <p id="rewardText"></p><p id="rewardStatus" class="small" role="status"></p>
     <button class="chip" id="retryResult" type="button" hidden>try another thing</button>
-    <button class="chip" id="playReward" type="button">play my voice keepsake</button>
     <audio id="rewardAudio" controls hidden></audio><a id="downloadReward" hidden>save your keepsake</a>
     <div class="conversation"><button class="chip" id="talkPip" type="button">talk to your guide</button><p id="agentHelp" class="small"></p><div id="chatTranscript" role="log" aria-label="Conversation with your guide"></div></div>
   </section>
@@ -157,6 +165,7 @@
 <script src="js/floors.js"></script>
 <script src="js/lift-panel.js"></script>
 <script src="js/audio.js"></script>
+<script src="js/moments.js"></script>
 <script src="js/player.js"></script>
 <script src="js/lift-motion.js"></script>
 <script src="js/journey.js"></script>

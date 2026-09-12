@@ -2,7 +2,7 @@
 const { character: defaultCharacter } = require('../public/js/floors');
 const GRADES = ['A*', 'A', 'B', 'C', 'D', 'F'];
 const VOICE_TAGS = new Set(['excited', 'curious', 'thoughtful', 'surprised', 'whispers', 'sighs', 'short pause', 'mischievously', 'warmly', 'calm', 'happy']);
-const clean = (value, length = 1600) => String(value || '').replace(/<[^>]*>|\[[^\]]*\]/g, '').replace(/[\p{Extended_Pictographic}\uFE0F*“”"]/gu, '').replace(/\r/g, '').replace(/[^\S\n]+/g, ' ').replace(/ *\n */g, '\n').trim().slice(0, length);
+const clean = (value, length = Infinity) => String(value || '').replace(/<[^>]*>|\[[^\]]*\]/g, '').replace(/[\p{Extended_Pictographic}\uFE0F*“”"]/gu, '').replace(/\r/g, '').replace(/[^\S\n]+/g, ' ').replace(/ *\n */g, '\n').trim().slice(0, length);
 const comparable = value => clean(value).replace(/\s+/g, ' ');
 const wordCount = value => (clean(value).match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu) || []).length;
 function voiceScript(response, candidate = '') {

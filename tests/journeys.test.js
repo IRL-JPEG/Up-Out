@@ -53,7 +53,7 @@ test("all rooms supply their own rubric and the shared gentle rhyme contract", (
     assert.ok(prompt.includes(floor.sharedGradingSystemPrompt || floor.validationPrompt));
     if (floor.grading) assert.ok(prompt.includes(floor.grading.roomBlock));
     assert.match(prompt, /A hand is helpful, never mandatory/);
-    assert.match(prompt, /30-55 spoken words/);
+    assert.match(prompt, /no word-count limit/);
     assert.match(prompt, /exactly two new original lines that rhyme/);
   }
 });
@@ -63,7 +63,7 @@ test("strict schema, typed evidence caps and moderation cannot be bypassed", () 
   assert.equal(normalizeGrade(sample(), "text").provenance, "user_text");
   assert.throws(() => normalizeGrade(sample({flag:"false"})));
   assert.throws(() => normalizeGrade(sample({response:"A spoon. Thanks!"})));
-  assert.throws(() => normalizeGrade(sample({headline:"THANKS"})));
+  assert.equal(normalizeGrade(sample({headline:"THANKS"})).headline,"THANKS");
   const flagged = normalizeGrade(sample({flag:true, grade:"A*", observedObject:"unsafe description"}));
   assert.equal(flagged.grade,"F"); assert.equal(flagged.observedObject,"another thing"); assert.equal(flagged.visualDetails,"");
   assert.equal(flagged.response,"Let's find something else together.");
